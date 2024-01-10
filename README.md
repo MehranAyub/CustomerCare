@@ -1,2 +1,2 @@
-# SparePartsShop
-Project assigned by OPE for react learning
+# Customer Care
+Project for Customer Care Service
