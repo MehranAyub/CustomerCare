@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 
-namespace TheShopWebApi.Controllers
+namespace TheCustomerCareWebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -56,7 +56,8 @@ namespace TheShopWebApi.Controllers
         [HttpPost]
         public IActionResult CreateProduct()
         {
-            try { 
+            try
+            {
                 var product = JsonConvert.DeserializeObject<Core.Data.Entities.Product>(Request.Form["form"]) ?? new Core.Data.Entities.Product();
                 var fileName = "";
                 var isFile = Request.Form.Files.Count;
@@ -78,27 +79,27 @@ namespace TheShopWebApi.Controllers
                 }
 
 
-            if (product.Id == 0)
-            {
-               
-                _repository.Product.CreateProduct(product);
-                _repository.Save();
+                if (product.Id == 0)
+                {
+
+                    _repository.Product.CreateProduct(product);
+                    _repository.Save();
                     return Ok(product);
                 }
-            else
-            {
-                UpdateProduct(product);
+                else
+                {
+                    UpdateProduct(product);
                     return StatusCode(250); //Status code if object is updated succefully
                 }
-            
-        }
+
+            }
             catch (Exception ex)
             {
                 throw ex;
             }
-           
+
         }
-      
+
 
         [HttpPut]
         public IActionResult UpdateProduct([FromBody] Core.Data.Entities.Product product)

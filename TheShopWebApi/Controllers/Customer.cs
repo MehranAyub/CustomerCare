@@ -10,7 +10,7 @@ using System.Text.Json;
 using System.Text;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace TheShopWebApi.Controllers
+namespace TheCustomerCareWebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -23,20 +23,20 @@ namespace TheShopWebApi.Controllers
             _repository = repositoryWrapper;
         }
         [HttpGet]
-        public async Task< IActionResult> GetAllCustomers()
+        public async Task<IActionResult> GetAllCustomers()
         {
             try
             {
-                    var customers = _repository.Customer.GetAllCustomers();
-                    if (customers != null)
-                    {
-                        return Ok(customers);
-                    }
-                    else
-                    {
-                        return Ok(null);
-                    }
- 
+                var customers = _repository.Customer.GetAllCustomers();
+                if (customers != null)
+                {
+                    return Ok(customers);
+                }
+                else
+                {
+                    return Ok(null);
+                }
+
             }
             catch (Exception ex)
             {
@@ -88,7 +88,7 @@ namespace TheShopWebApi.Controllers
         [HttpPost]
         public IActionResult CreateCustomer([FromBody] Core.Data.Entities.Customer customer)
         {
-            
+
             try
             {
                 if (customer == null)
@@ -111,7 +111,7 @@ namespace TheShopWebApi.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Internal server error"+ex);
+                return StatusCode(500, "Internal server error" + ex);
             }
         }
         [HttpPost("ValidateCustomer")]
@@ -132,8 +132,8 @@ namespace TheShopWebApi.Controllers
 
 
 
-               var response= _repository.Customer.ValidateCustomer(customer);
-                return Ok(response);    
+                var response = _repository.Customer.ValidateCustomer(customer);
+                return Ok(response);
 
             }
             catch (Exception ex)

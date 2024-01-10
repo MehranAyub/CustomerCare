@@ -1,4 +1,4 @@
-namespace TheShopWebApi
+namespace TheCustomerCareWebApi
 {
     public class WeatherForecast
     {

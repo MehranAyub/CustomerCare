@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace TheShopWebApi.Controllers
+namespace TheCustomerCareWebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]

@@ -3,7 +3,7 @@ using Core.Application.Orders.OrderDtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace TheShopWebApi.Controllers
+namespace TheCustomerCareWebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -22,7 +22,7 @@ namespace TheShopWebApi.Controllers
             try
             {
                 var orders = _repository.Order.GetAllOrders();
-            
+
                 return Ok(orders);
             }
             catch (Exception ex)
@@ -105,7 +105,7 @@ namespace TheShopWebApi.Controllers
         [HttpPut("OrderActions")]
         public IActionResult OrderActions([FromBody] OrderListDto action)
         {
-          
+
             try
             {
                 _repository.Order.OrderActions(action);
