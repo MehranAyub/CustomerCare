@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheShopWebApi", "TheShopWebApi\TheShopWebApi.csproj", "{6E64D71D-20B5-4F43-A103-72867472F098}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomerCare", "TheShopWebApi\CustomerCare.csproj", "{6E64D71D-20B5-4F43-A103-72867472F098}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Data", "Core.Data\Core.Data.csproj", "{2C283FB4-E4D7-4119-8718-0E11C85BEA64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Data", "Core.Data\Core.Data.csproj", "{2C283FB4-E4D7-4119-8718-0E11C85BEA64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Application", "Core.Application\Core.Application.csproj", "{8DBBFB36-DC73-43D1-9491-9EDD0D44DE71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Application", "Core.Application\Core.Application.csproj", "{8DBBFB36-DC73-43D1-9491-9EDD0D44DE71}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
