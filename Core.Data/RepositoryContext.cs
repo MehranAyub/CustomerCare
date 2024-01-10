@@ -10,11 +10,28 @@ namespace Core.Data
         {
         }
 
-        public DbSet<Customer> Customers { get; set; }
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<Product> Products { get; set; }
-        public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Complaint> Complaints { get; set; }
+        public DbSet<Blog> Blogs { get; set; }
+        public DbSet<Image> Images { get; set; }
 
-       
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Complaint>()
+                .HasMany(n => n.Images)
+                .WithOne(a => a.Complaint)
+                .HasForeignKey(n => n.ComplaintId);
+            modelBuilder.Entity<Blog>()
+                .HasMany(n => n.Images)
+                .WithOne(a => a.Blog)
+                .HasForeignKey(n => n.BlogId);
+
+            modelBuilder.Entity<Image>().Ignore(x => x.Complaint);
+            modelBuilder.Entity<Image>().Ignore(x => x.Blog);
+        }
+
     }
 }

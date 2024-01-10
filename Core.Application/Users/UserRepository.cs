@@ -9,38 +9,31 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Application.Customers
+namespace Core.Application.Users
 {
-    internal class CustomerRepository : ICustomerRepository,IRepositoryBase<Customer>
+    internal class UserRepository : IUserRepository,IRepositoryBase<User>
     {
         RepositoryContext _repositoryContext;
-        public CustomerRepository(RepositoryContext repositoryContext)
+        public UserRepository(RepositoryContext repositoryContext)
         {
             _repositoryContext = repositoryContext;
         }
-        public IEnumerable<Customer> GetAllCustomers()
+        public IEnumerable<User> GetAllUsers()
         {
-
-            return _repositoryContext.Customers.OrderBy(s => s.FName).ToList();
+            return _repositoryContext.Users.Where(n=>n.Role!=Role.Admin).OrderBy(s => s.Id).ToList();
         }
 
-        public Customer GetCustomerById(int customerId)
+        public User ValidateUser(UserDto user)
         {
-            var customer = _repositoryContext.Customers.FirstOrDefault(s => s.Id == customerId);
-            return customer;
-        }
-        
-        public Customer ValidateCustomer(CustomerDto customer)
-        {
-            var user = _repositoryContext.Customers.FirstOrDefault(c => c.Email == customer.Email && c.Passwrord==customer.Password);
-            if (user != null)
+            var entity = _repositoryContext.Users.FirstOrDefault(c => c.Email ==user.Email && c.Password==user.Password);
+            if (entity != null)
             {
-                return user;
+                return entity;
             }
             return null;
         }
-        public Customer GetCustomerWithDetails(int customerId)
-        {
+        //public Customer GetCustomerWithDetails(int customerId)
+        //{
             //Customer query = null;
             //var studentEntity = _repositoryContext.Customers.Where(student => student.Id.Equals(customerId)).FirstOrDefault();
             //if (studentEntity != null)
@@ -59,28 +52,28 @@ namespace Core.Application.Customers
             //}
 
 
-            return null;
-        }
+        //    return null;
+        //}
 
-        public void CreateCustomer(Customer customer)
+        public void CreateCustomer(User user)
         {
-            _repositoryContext.Customers.Add(customer);
+            _repositoryContext.Users.Add(user);
 
         }
 
-        public void UpdateCustomer(Customer customer)
+        public void UpdateCustomer(User user)
         {
 
-            _repositoryContext.Customers.Update(customer);
+            _repositoryContext.Users.Update(user);
 
         }
 
-        public void DeleteCustomer(Customer customer)
+        public void DeleteUser(User user)
         {
             //var address = _repositoryContext.Addresses.FirstOrDefault(address => address.Id.Equals(student.AddressId));
             //_repositoryContext.Students.Remove(student);
             //_repositoryContext.Addresses.Remove(address);
-
+            _repositoryContext.Users.Remove(user);
         }
 
         public IQueryable<Customer> GetAll()
@@ -107,5 +100,7 @@ namespace Core.Application.Customers
         {
             throw new NotImplementedException();
         }
+       
+      
     }
 }

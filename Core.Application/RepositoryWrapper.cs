@@ -1,6 +1,4 @@
-﻿using Core.Application.Customers;
-using Core.Application.Orders;
-using Core.Application.Products;
+﻿using Core.Application.Users;
 using Core.Data;
 using System;
 using System.Collections.Generic;
@@ -13,48 +11,26 @@ namespace Core.Application
     public class RepositoryWrapper: IRepositoryWrapper
     {
         private RepositoryContext _repositoryContext;
-        private ICustomerRepository _studentRepository;
-        private IProductRepository _teacherRepository;
-        private IOrderRepository _addressRepository;
+        private IUserRepository _userRepository;
+
 
         public RepositoryWrapper(RepositoryContext repositoryContext)
         {
             _repositoryContext = repositoryContext;
         }
-        public ICustomerRepository Customer
-        {
-            get
-            {
-                if (_studentRepository == null)
-                {
-                    _studentRepository = new CustomerRepository(_repositoryContext);
-                }
-                return _studentRepository;
-            }
-        }
-        public IProductRepository Product
-        {
-            get
-            {
-                if (_teacherRepository == null)
-                {
-                    _teacherRepository = new ProductRepository(_repositoryContext);
-                }
-                return _teacherRepository;
-            }
-        }
-        public IOrderRepository Order
-        {
-            get
-            {
-                if (_addressRepository == null)
-                {
-                    _addressRepository = new OrderRepository(_repositoryContext);
-                }
-                return _addressRepository;
-            }
-        }
+        
 
+        public IUserRepository User
+        {
+            get
+            {
+                if (_userRepository == null)
+                {
+                    _userRepository = new UserRepository(_repositoryContext);
+                }
+                return _userRepository;
+            }
+        }
 
         public void Save()
         {

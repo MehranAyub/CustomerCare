@@ -1,6 +1,4 @@
 ﻿using Core.Application.Customers;
-using Core.Application.Orders;
-using Core.Application.Products;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +9,7 @@ namespace Core.Application
 {
     public interface IRepositoryWrapper
     {
-        ICustomerRepository Customer { get; }
-        IProductRepository Product { get; }
-        IOrderRepository Order { get; }
+        IUserRepository User { get; }
 
         void Save();
     }
