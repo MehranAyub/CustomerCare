@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Core.Data;
 using Core.Data.Entities;
+using Core.Data.Dtos;
+using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace TheCustomerCareWebApi.Controllers
 {
@@ -15,156 +18,206 @@ namespace TheCustomerCareWebApi.Controllers
             _context = repositoryContext;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<PayloadCustom<User>> GetAll()
         {
             try
             {
-                var customers = _context.Users.ToList();
-                if (customers != null)
+                var users =await _context.Users.ToListAsync();
+                if (users != null)
                 {
-                    return Ok(customers);
+                    return new PayloadCustom<User>()
+                    {
+                        EntityList = users,
+                        Status = (int)HttpStatusCode.OK,
+                    };
                 }
                 else
                 {
-                    return Ok(null);
+                    return new PayloadCustom<User>()
+                    {
+                       
+                        Status = (int)HttpStatusCode.NoContent,
+                    }; ;
                 }
 
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Internal server error" + ex);
+                return  new PayloadCustom<User>()
+                {
+                    Message=ex.Message,
+                    Status = (int)HttpStatusCode.InternalServerError,
+                }; 
             }
         }
 
-        [HttpGet("{id}", Name = "UserById")]
-        public IActionResult GetUserById(Guid id)
+        [HttpGet("{id}", Name = "GetUserById")]
+        public async Task<PayloadCustom<User>> GetUserById(Guid id)
         {
             try
             {
                 
-                var user =_context.Users.Where(n=>n.Id==id).FirstOrDefault();
-                if (user == null)
+                var user =await _context.Users.Where(n=>n.Id==id).FirstOrDefaultAsync();
+                if (user != null)
                 {
-                    return NotFound();
+                    return new PayloadCustom<User>()
+                    {
+                        Entity = user,
+                        Status = (int)HttpStatusCode.OK,
+                    };
                 }
                 else
                 {
-                    return Ok(user);
+                    return new PayloadCustom<User>()
+                    {
+                        Status = (int)HttpStatusCode.NotFound,
+                    };
                 }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Internal server error " + ex);
+                return new PayloadCustom<User>()
+                {
+                    Message = ex.Message,
+                    Status = (int)HttpStatusCode.InternalServerError,
+                };
             }
         }
 
        
 
         [HttpPost]
-        public IActionResult CreateUser([FromBody] User user )
+        public async Task<PayloadCustom<User>> CreateUser([FromBody] User user )
         {
 
             try
             {
-                if (user == null)
+                var data=await _context.Users.Where(n=>n.Email==user.Email).FirstOrDefaultAsync();
+                if(data!=null)
                 {
-                    return BadRequest("Customer object is null");
+                    return new PayloadCustom<User>()
+                    {
+                        Message="Email already Exists",
+                        Status = (int)HttpStatusCode.NotAcceptable,
+                    };
                 }
-
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest("Invalid model object");
-                }
-
-
+                var newUser=new User() { FirstName=user.FirstName,LastName=user.LastName,Email=user.Email,Password=user.Password,Address=user.Address,Phone=user.Phone,Role=user.Role};
 
                 _context.Users.Add(user);
                 _context.SaveChanges();
 
 
-                return CreatedAtRoute("CustomerById", new { id = user.Id }, user);
+                return  new PayloadCustom<User>()
+                {
+                    Entity = user,
+                    Status = (int)HttpStatusCode.OK,
+                };
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Internal server error" + ex);
+                return new PayloadCustom<User>()
+                {
+                    Message = ex.Message,
+                    Status = (int)HttpStatusCode.InternalServerError,
+                };
             }
         }
-        //[HttpPost("ValidateCustomer")]
-        //public IActionResult ValidateCustomer([FromBody] CustomerDto customer)
-        //{
+        [HttpPost("ValidateUser")]
+        public async Task<PayloadCustom<User>> ValidateUser([FromBody] UserLoginDto user)
+        {
 
-        //    try
-        //    {
-        //        if (customer == null)
-        //        {
-        //            return BadRequest("Customer object is null");
-        //        }
+            try
+            {
+               
+                var response =await _context.Users.Where(n=>n.Email==user.Email && n.Password == user.Password).Select(n => new User{ Id=n.Id,FirstName= n.FirstName,LastName= n.LastName,Email=n.Email,Role=n.Role}).FirstOrDefaultAsync();
+                if (response != null)
+                {
+                    return new PayloadCustom<User>()
+                    {
+                        Entity = response,
+                        Status = (int)HttpStatusCode.OK,
+                    };
 
-        //        if (!ModelState.IsValid)
-        //        {
-        //            return BadRequest("Invalid model object");
-        //        }
+                }
+                return new PayloadCustom<User>()
+                {
+                    Status = (int)HttpStatusCode.Unauthorized,
+                };
+            }
+            catch (Exception ex)
+            {
+                return new PayloadCustom<User>()
+                {
+                    Message = ex.Message,
+                    Status = (int)HttpStatusCode.InternalServerError,
+                };
+            }
+        }
+        [HttpPut]
+        public async Task<PayloadCustom<User>> UpdateUser([FromBody] User user)
+        {
+            try
+            {
+               
+                _context.Update(user);
+                var data=await _context.SaveChangesAsync();
+                if (data > 0)
+                {
+                    return new PayloadCustom<User>()
+                    {
+                        Entity = user,
+                        Status = (int)HttpStatusCode.OK,
+                    };
+                }
+                return new PayloadCustom<User>()
+                {
+                    Entity = user,
+                    Status = (int)HttpStatusCode.BadGateway,
+                };
+            }
+            catch (Exception ex)
+            {
+                return new PayloadCustom<User>()
+                {
+                    Message = ex.Message,
+                    Status = (int)HttpStatusCode.InternalServerError,
+                };
+            }
+        }
 
+        [HttpDelete("{id}")]
+        public async Task<PayloadCustom<string>> DeleteUser(Guid id)
+        {
+            try
+            {
+                var user =await _context.Users.Where(n=>n.Id==id).FirstOrDefaultAsync();
 
+                if (user == null)
+                {
+                    return new PayloadCustom<string>()
+                    {
+                       
+                        Status = (int)HttpStatusCode.NotFound,
+                    };
+                }
 
-        //        var response = _repository.Customer.ValidateCustomer(customer);
-        //        return Ok(response);
+                _context.Users.Remove(user);
+               await _context.SaveChangesAsync();
 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "Internal server error" + ex);
-        //    }
-        //}
-        //[HttpPut]
-        //public IActionResult UpdateCustomer([FromBody] Core.Data.Entities.Customer customer)
-        //{
-        //    try
-        //    {
-        //        if (customer == null)
-        //        {
-        //            return BadRequest("customer object is null");
-        //        }
+                return new PayloadCustom<string>()
+                {
 
-        //        if (!ModelState.IsValid)
-        //        {
-        //            return BadRequest("Invalid model object");
-        //        }
-
-
-
-        //        _repository.Customer.UpdateCustomer(customer);
-        //        _repository.Save();
-
-        //        return NoContent();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "Internal server error " + ex);
-        //    }
-        //}
-
-        //[HttpDelete("{id}")]
-        //public IActionResult DeleteCustomer(int id)
-        //{
-        //    try
-        //    {
-        //        var customer = _repository.Customer.GetCustomerById(id);
-
-        //        if (customer == null)
-        //        {
-        //            return NotFound();
-        //        }
-
-        //        _repository.Customer.DeleteCustomer(customer);
-        //        _repository.Save();
-
-        //        return NoContent();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "Internal server error " + ex);
-        //    }
-        //}
+                    Status = (int)HttpStatusCode.OK,
+                };
+            }
+            catch (Exception ex)
+            {
+                return new PayloadCustom<string>()
+                {
+                    Message = ex.Message,
+                    Status = (int)HttpStatusCode.InternalServerError,
+                };
+            }
+        }
     }
 }
