@@ -10,10 +10,10 @@ namespace TheCustomerCareWebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class Users : ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly RepositoryContext _context;
-        public Users(RepositoryContext repositoryContext)
+        public UserController(RepositoryContext repositoryContext)
         {
             _context = repositoryContext;
         }
