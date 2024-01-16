@@ -11,14 +11,14 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import HP2 from "../../assets/Mehran.jpg";
-import { ListItemAvatar } from "@mui/material";
+import { ListItemAvatar, Typography } from "@mui/material";
 import { AccountCircle } from "@mui/icons-material";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
-import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LockIcon from "@mui/icons-material/Lock";
 import DensitySmallIcon from "@mui/icons-material/DensitySmall";
@@ -145,9 +145,9 @@ const Index = ({ children }) => {
           <ListItem className="listHover" disablePadding>
             <ListItemButton onClick={() => goToPage("/addProducts")}>
               <ListItemIcon>
-                <LocalMallIcon sx={{ color: "#ffff" }} />
+                <ReportProblemIcon sx={{ color: "#ffff" }} />
               </ListItemIcon>
-              <ListItemText primary="Products" />
+              <ListItemText primary="Complaints" />
             </ListItemButton>
           </ListItem>
           <ListItem className="listHover" disablePadding>
@@ -155,7 +155,7 @@ const Index = ({ children }) => {
               <ListItemIcon>
                 <DensitySmallIcon sx={{ color: "#ffff" }} />
               </ListItemIcon>
-              <ListItemText primary="Orders" />
+              <ListItemText primary="Blogs" />
             </ListItemButton>
           </ListItem>
           <ListItem className="listHover" disablePadding>
@@ -178,8 +178,10 @@ const Index = ({ children }) => {
         </List>
         <Divider sx={{ bgcolor: "white" }} />
         <Box component="div" sx={{ m: 5 }}>
-          <p>Dealers Corporate</p>
-          <PrecisionManufacturingIcon sx={{ fontSize: 150 }} />
+          <Typography fontSize="22px" textAlign="center">
+            DocBlock
+          </Typography>
+          <ReportProblemIcon sx={{ fontSize: 150 }} />
         </Box>
       </Drawer>
       <Box
