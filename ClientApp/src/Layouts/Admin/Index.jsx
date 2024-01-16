@@ -11,8 +11,10 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import HP2 from "../../assets/Mehran.jpg";
-import { Grid, ListItemAvatar } from "@mui/material";
-import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import { ListItemAvatar } from "@mui/material";
+import { AccountCircle } from "@mui/icons-material";
+import MenuItem from "@mui/material/MenuItem";
+import Menu from "@mui/material/Menu";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
@@ -21,12 +23,24 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LockIcon from "@mui/icons-material/Lock";
 import DensitySmallIcon from "@mui/icons-material/DensitySmall";
 import { useNavigate } from "react-router-dom";
+import LogoutIcon from "@mui/icons-material/Logout";
+import React from "react";
+import IconButton from "@mui/material/IconButton";
 
 const drawerWidth = 240;
 const user = JSON.parse(localStorage.getItem("user"));
 console.log(user);
 
 const Index = ({ children }) => {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   const navigate = useNavigate();
   const goToPage = (url) => {
     navigate(url);
@@ -47,25 +61,42 @@ const Index = ({ children }) => {
           bgcolor: "white",
         }}
       >
-        <Grid
-          container
-          direction="row"
+        <Box
+          display="dlex"
           justifyContent="flex-end"
-          alignItems="flex-start"
-          spacing={2}
-          mt={0}
+          alignItems="center"
+          mt={1}
         >
-          <Grid item>
-            <NotificationsActiveIcon
-              sx={{ mt: 1 }}
-              fontSize="medium"
-              color="primary"
-            />
-          </Grid>
-          <Grid item>
-            <Avatar sx={{ mr: 1 }} alt={`Avatar`} src={HP2} />
-          </Grid>
-        </Grid>
+          <IconButton
+            size="large"
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={handleMenu}
+            style={{ color: "#38376e" }}
+          >
+            <AccountCircle />
+          </IconButton>
+        </Box>
+        <Menu
+          id="menu-appbar"
+          anchorEl={anchorEl}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          keepMounted
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+        >
+          <MenuItem onClick={() => Logout("login")} sx={{ fontSize: "14px" }}>
+            <LogoutIcon sx={{ marginRight: 1 }} fontSize="small" /> Log Out
+          </MenuItem>
+        </Menu>
       </AppBar>
       <Drawer
         sx={{
@@ -87,7 +118,7 @@ const Index = ({ children }) => {
               <ListItemAvatar>
                 <Avatar alt={`Avatar`} src={HP2} />
               </ListItemAvatar>
-              <ListItemText primary={user.fName + " " + user.lName} />
+              <ListItemText primary={user.firstName + " " + user.lastName} />
             </ListItemButton>
           </ListItem>
         </List>

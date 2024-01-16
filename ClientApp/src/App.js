@@ -12,7 +12,7 @@ const App = () => {
   return (
     <div>
       <UserContext.Provider value={providerValue}>
-        {role === "admin" ? (
+        {role === 0 ? (
           <AdminLayout>
             <Outlet />
           </AdminLayout>

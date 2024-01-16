@@ -1,5 +1,5 @@
 import React from "react";
-import { TextField } from "@mui/material";
+import { TextField, Typography } from "@mui/material";
 import axios from "axios";
 import { Button } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -10,10 +10,11 @@ import { useNavigate } from "react-router-dom";
 
 export default function Registration() {
   const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    fname: "",
-    lname: "",
+    firstName: "",
+    lastName: "",
     email: "",
     address: "",
     phone: "",
@@ -27,30 +28,40 @@ export default function Registration() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    setErrorMessage("");
     // prevents the submit button from refreshing the page
     if (showErrorMessage === false) {
       const customer = {
-        fName: formData.fname,
-        lName: formData.lname,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         address: formData.address,
         email: formData.email,
         phone: formData.phone,
-        passwrord: formData.password,
+        password: formData.password,
+        role: 1,
       };
 
       axios.defaults.headers.post["Content-Type"] = "application/json";
 
       axios
-        .post("https://localhost:7268/api/Customer", JSON.stringify(customer), {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
+        .post(
+          "https://localhost:7268/api/User/CreateUser",
+          JSON.stringify(customer),
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
         .then(function (response) {
           console.log(response);
-          alert("User Registered Successfully");
-          setFormData([]);
-          navigate("/login");
+
+          if (response && response.data.status === 200) {
+            alert("You are Registered Successfully");
+            navigate("/login");
+          } else if (response.data.status == 403) {
+            setErrorMessage("Email already Exists");
+          }
         })
         .catch(function (error) {
           console.log(error);
@@ -74,22 +85,22 @@ export default function Registration() {
           </Grid>
           <Grid item xs={12} md={6}>
             <TextField
-              name="fname"
+              name="firstName"
               fullWidth
-              label="FirstName"
+              label="First Name"
               size="small"
               required
-              value={formData.fname}
+              value={formData.firstName}
               onChange={handleChange}
             />
           </Grid>
           <Grid item xs={12} md={6}>
             <TextField
-              name="lname"
+              name="lastName"
               fullWidth
-              label="LastName"
+              label="Last Name"
               size="small"
-              value={formData.lname}
+              value={formData.lastName}
               onChange={handleChange}
             />
           </Grid>
@@ -156,6 +167,9 @@ export default function Registration() {
             />
           </Grid>
         </Grid>
+        <Typography textAlign="center" color="error">
+          {errorMessage}
+        </Typography>
         <Button
           type="submit"
           fullWidth

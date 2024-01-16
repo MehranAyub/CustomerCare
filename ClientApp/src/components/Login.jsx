@@ -24,23 +24,22 @@ export default function Login() {
     axios.defaults.headers.post["Content-Type"] = "application/json";
 
     axios
-      .post("https://localhost:7268/api/Customer/ValidateCustomer", formData, {
+      .post("https://localhost:7268/api/User/ValidateUser", formData, {
         headers: {
           "Content-Type": "application/json",
         },
       })
       .then(function (response) {
         console.log(response);
-        if (response.status !== 200) {
-          setShowErrorMessage("Username or Password is incorrect");
-        } else {
-          localStorage.setItem("user", JSON.stringify(response.data));
-          if (response.data.role !== "admin") {
-            // navigate("/products");
-            window.location.href = "/products";
-          } else {
+        if (response && response.data.status === 200) {
+          localStorage.setItem("user", JSON.stringify(response.data.entity));
+          if (response.data.entity.role === 0) {
             window.location.href = "/dashboard";
+          } else {
+            window.location.href = "/products";
           }
+        } else {
+          setShowErrorMessage("Username or Password is incorrect");
         }
       })
       .catch(function (error) {
