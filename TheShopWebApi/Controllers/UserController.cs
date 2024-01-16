@@ -86,7 +86,7 @@ namespace TheCustomerCareWebApi.Controllers
 
        
 
-        [HttpPost]
+        [HttpPost("CreateUser")]
         public async Task<PayloadCustom<User>> CreateUser([FromBody] User user )
         {
 
@@ -98,7 +98,7 @@ namespace TheCustomerCareWebApi.Controllers
                     return new PayloadCustom<User>()
                     {
                         Message="Email already Exists",
-                        Status = (int)HttpStatusCode.NotAcceptable,
+                        Status = (int)HttpStatusCode.Forbidden,
                     };
                 }
                 var newUser=new User() { FirstName=user.FirstName,LastName=user.LastName,Email=user.Email,Password=user.Password,Address=user.Address,Phone=user.Phone,Role=user.Role};
