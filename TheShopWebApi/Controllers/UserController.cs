@@ -22,7 +22,7 @@ namespace TheCustomerCareWebApi.Controllers
         {
             try
             {
-                var users =await _context.Users.ToListAsync();
+                var users =await _context.Users.Where(n=>n.Role!=Role.Admin).ToListAsync();
                 if (users != null)
                 {
                     return new PayloadCustom<User>()

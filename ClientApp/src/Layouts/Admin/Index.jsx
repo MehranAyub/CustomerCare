@@ -139,7 +139,7 @@ const Index = ({ children }) => {
               <ListItemIcon>
                 <PersonAddIcon sx={{ color: "#ffff" }} />
               </ListItemIcon>
-              <ListItemText primary="Customers" />
+              <ListItemText primary="Users" />
             </ListItemButton>
           </ListItem>
           <ListItem className="listHover" disablePadding>

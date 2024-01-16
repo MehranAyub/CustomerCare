@@ -1,5 +1,5 @@
 import React from "react";
-import { TextField, Typography } from "@mui/material";
+import { TextField, Typography, CircularProgress } from "@mui/material";
 import axios from "axios";
 import { Button } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -9,6 +9,8 @@ import { Container } from "@mui/system";
 import { useNavigate } from "react-router-dom";
 
 export default function Registration() {
+  const [isLoading, setIsLoading] = useState(false);
+
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
@@ -29,8 +31,8 @@ export default function Registration() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setErrorMessage("");
-    // prevents the submit button from refreshing the page
     if (showErrorMessage === false) {
+      setIsLoading(true);
       const customer = {
         firstName: formData.firstName,
         lastName: formData.lastName,
@@ -65,6 +67,9 @@ export default function Registration() {
         })
         .catch(function (error) {
           console.log(error);
+        })
+        .finally((res) => {
+          setIsLoading(false);
         });
     }
   };
@@ -109,6 +114,7 @@ export default function Registration() {
               name="email"
               fullWidth
               label="Email"
+              type="email"
               size="small"
               required
               value={formData.email}
@@ -172,118 +178,18 @@ export default function Registration() {
         </Typography>
         <Button
           type="submit"
+          disabled={isLoading}
           fullWidth
           variant="contained"
           sx={{ mt: 3, mb: 2 }}
         >
-          Sign Up
+          {isLoading ? (
+            <CircularProgress size="1rem"></CircularProgress>
+          ) : (
+            "SignUp"
+          )}
         </Button>
       </Box>
     </Container>
-    // <Grid container sx={{ mt: 12 }}>
-    //   <Grid item xs={12} sm={4}></Grid>
-    //   <Grid item xs={12} sm={5}>
-    //     <h3 style={{ textAlign: "center" }}>Signup</h3>
-    //     <Box
-    //       onSubmit={handleSubmit}
-    //       component="form"
-    //       sx={{
-    //         "& .MuiTextField-root": { m: 1, mb: 3, width: "35ch" },
-    //       }}
-    //       autoComplete="off"
-    //     >
-    //       <div>
-    //         <TextField
-    //           label="FirstName"
-    //           name="fname"
-    //           size="small"
-    //           required
-    //           value={formData.fname}
-    //           onChange={(e) =>
-    //             setFormData({ ...formData, fname: e.target.value })
-    //           }
-    //         />
-    //         <TextField
-    //           label="LastName"
-    //           name="lname"
-    //           size="small"
-    //           value={formData.lname}
-    //           onChange={(e) =>
-    //             setFormData({ ...formData, lname: e.target.value })
-    //           }
-    //         />
-
-    //         <TextField
-    //           label="Email"
-    //           style={{ width: "72ch" }}
-    //           name="email"
-    //           size="small"
-    //           required
-    //           type="email"
-    //           value={formData.email}
-    //           onChange={(e) =>
-    //             setFormData({ ...formData, email: e.target.value })
-    //           }
-    //         />
-
-    //         <TextField
-    //           label="Phone"
-    //           id="outlined-size-small"
-    //           size="small"
-    //           name="phone"
-    //           value={formData.phone}
-    //           onChange={(e) =>
-    //             setFormData({ ...formData, phone: e.target.value })
-    //           }
-    //         />
-    //         <TextField
-    //           label="Address"
-    //           id="outlined-size-small"
-    //           size="small"
-    //           name="address"
-    //           required
-    //           value={formData.address}
-    //           onChange={(e) =>
-    //             setFormData({ ...formData, address: e.target.value })
-    //           }
-    //         />
-    //         <TextField
-    //           label="Password"
-    //           id="outlined-size-small"
-    //           size="small"
-    //           name="password"
-    //           required
-    //           value={formData.password}
-    //           onChange={(e) =>
-    //             setFormData({ ...formData, password: e.target.value })
-    //           }
-    //         />
-    //         <TextField
-    //           label="Confirm Password"
-    //           size="small"
-    //           name="confpassword"
-    //           required
-    //           value={formData.confpassword}
-    //           onChange={(e) => {
-    //             setFormData({ ...formData, confpassword: e.target.value });
-    //             handleCPassword(e);
-    //           }}
-    //           error={showErrorMessage}
-    //           helperText={showErrorMessage ? "Passwords did not match" : " "}
-    //         />
-    //       </div>
-
-    //       <Button
-    //         sx={{ width: "40%", ml: 24 }}
-    //         type="submit"
-    //         variant="contained"
-    //       >
-    //         Submit
-    //       </Button>
-    //     </Box>
-    //   </Grid>
-
-    //   <Grid item xs={12} sm={3}></Grid>
-    // </Grid>
   );
 }

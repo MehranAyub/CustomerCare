@@ -1,5 +1,5 @@
 import React from "react";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, CircularProgress } from "@mui/material";
 import axios from "axios";
 import Box from "@mui/material/Box";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import { Container } from "@mui/system";
 import LoginIcon from "@mui/icons-material/Login";
 
 export default function Login() {
+  const [isLoading, setIsLoading] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState("");
   const [formData, setFormData] = useState({
     email: "",
@@ -18,6 +19,7 @@ export default function Login() {
   };
   const handleSubmit = (event) => {
     event.preventDefault();
+    setIsLoading(true);
     setShowErrorMessage("");
     // prevents the submit button from refreshing the page
     console.log(formData);
@@ -44,6 +46,9 @@ export default function Login() {
       })
       .catch(function (error) {
         console.log(error);
+      })
+      .finally((res) => {
+        setIsLoading(false);
       });
   };
 
@@ -59,6 +64,7 @@ export default function Login() {
               name="email"
               fullWidth
               label="Username"
+              type="email"
               size="large"
               required
               value={formData.email}
@@ -88,12 +94,17 @@ export default function Login() {
         </Grid>
         <Button
           type="submit"
+          disabled={isLoading}
           fullWidth
           variant="contained"
           sx={{ mt: 3, mb: 2 }}
         >
-          Login
-          <LoginIcon />
+          {isLoading ? (
+            <CircularProgress size="1rem"></CircularProgress>
+          ) : (
+            "Login"
+          )}
+          <LoginIcon sx={{ marginLeft: 1 }} />
         </Button>
       </Box>
     </Container>
