@@ -12,6 +12,7 @@ const index = ({ children }) => {
           flexGrow: 1,
           bgcolor: "rgb(249, 250, 240)",
           p: 3,
+          minHeight: "100vh",
         }}
       >
         {children}

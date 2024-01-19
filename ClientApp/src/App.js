@@ -7,12 +7,11 @@ const App = () => {
   const [value, setValue] = useState([]);
   const providerValue = useMemo(() => ({ value, setValue }), [value, setValue]);
 
-  const role = JSON.parse(localStorage.getItem("user"))?.role;
-  console.log("checking", role);
+  const user = JSON.parse(localStorage.getItem("user"));
   return (
     <div>
       <UserContext.Provider value={providerValue}>
-        {role === 0 ? (
+        {user ? (
           <AdminLayout>
             <Outlet />
           </AdminLayout>

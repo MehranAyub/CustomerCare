@@ -7,6 +7,7 @@ using System.Net;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using System.Runtime.Intrinsics.Arm;
 
 namespace TheCustomerCareWebApi.Controllers
 {
@@ -52,7 +53,40 @@ namespace TheCustomerCareWebApi.Controllers
                 };
             }
         }
+        [HttpPost("GetComplaintsByUserId")]
+        public async Task<PayloadCustom<Complaint>> GetComplaintsByUserId(string userId)
+        {
+            try
+            {
+                var Id=new Guid(userId);
+                var complaints = await _context.Complaints.Where(n=>n.CustomerId== Id || n.AgentId== Id).ToListAsync();
+                if (complaints != null)
+                {
+                    return new PayloadCustom<Complaint>()
+                    {
+                        EntityList = complaints,
+                        Status = (int)HttpStatusCode.OK,
+                    };
+                }
+                else
+                {
+                    return new PayloadCustom<Complaint>()
+                    {
 
+                        Status = (int)HttpStatusCode.NoContent,
+                    }; ;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new PayloadCustom<Complaint>()
+                {
+                    Message = ex.Message,
+                    Status = (int)HttpStatusCode.InternalServerError,
+                };
+            }
+        }
         [HttpGet("{id}", Name = "GetComplaintById")]
         public async Task<PayloadCustom<Complaint>> GetComplaintById(Guid id)
         {
@@ -85,27 +119,32 @@ namespace TheCustomerCareWebApi.Controllers
                 };
             }
         }
-        [HttpPost]
-        public async Task<PayloadCustom<Complaint>> CreateProduct()
+        [HttpPost("CreateComplaint")]
+        public async Task<PayloadCustom<Complaint>> CreateComplaint()
         {
             try
             {
-                var complaint = JsonConvert.DeserializeObject<Complaint>(Request.Form["form"]) ?? new Complaint();
+                var complaint = new Complaint();
+                 complaint.Type = Request.Form["type"];
+                complaint.Subject = Request.Form["subject"];
+                complaint.Description = Request.Form["description"];
+                complaint.CustomerId = new Guid(Request.Form["customerId"]);
+
                 var complaintImages = new List<Image>();
                 var fileName = "";
                 var isFile = Request.Form.Files.Count;
                 if (isFile > 0)
                 {
-                    var postedFile = Request.Form.Files[0];
-                    if (postedFile.Length > 0)
+                    var postedFiles = Request.Form.Files;
+                    var uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
+                    foreach (var file in postedFiles)
                     {
                         var image=new Image();
-                        var uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "Assets");
-                        fileName = ContentDispositionHeaderValue.Parse(postedFile.ContentDisposition).FileName?.Trim('"');
+                        fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName?.Trim('"');
                         var finalPath = Path.Combine(uploadFolder, fileName);
                         using (var fileStream = new FileStream(finalPath, FileMode.Create))
                         {
-                            postedFile.CopyTo(fileStream);
+                            file.CopyTo(fileStream);
                         }
                         image.ImageData = fileName;
                         complaintImages.Add(image);
@@ -131,6 +170,33 @@ namespace TheCustomerCareWebApi.Controllers
             }
 
         }
+
+        private IEnumerable<string> ProcessFiles(IEnumerable<IFormFile> files, string sourcePath, string destinationPath, string urlBase)
+        {
+            List<string> fileUrls = new List<string>();
+
+            foreach (var file in files)
+            {
+                if (file.Length > 0)
+                {
+                    var fileName = Path.GetFileName(file.FileName);
+                    var sourceFilePath = Path.Combine(sourcePath, fileName);
+                    var destinationFilePath = Path.Combine(destinationPath, fileName);
+
+                    // Move the file
+                    System.IO.File.Move(sourceFilePath, destinationFilePath);
+
+                    // Generate URL
+                    var fileUrl = Path.Combine(urlBase, fileName);
+                    fileUrls.Add(fileUrl);
+                }
+            }
+
+            return fileUrls;
+        }
+
+
+
 
     }
 }

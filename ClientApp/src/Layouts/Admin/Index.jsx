@@ -98,6 +98,7 @@ const Index = ({ children }) => {
           </MenuItem>
         </Menu>
       </AppBar>
+
       <Drawer
         sx={{
           width: drawerWidth,
@@ -123,59 +124,125 @@ const Index = ({ children }) => {
           </ListItem>
         </List>
         <Toolbar />
+        {/* <Typography mt={2} mb={2} fontSize="22px" textAlign="center">
+          {user.role === 0
+            ? "Admin"
+            : user.role === 1
+            ? "Customer"
+            : user.role === 2
+            ? "Agent"
+            : ""}
+        </Typography> */}
         <Divider sx={{ bgcolor: "white" }} />
+        {user.role === 0 ? (
+          <List>
+            <ListItem className="listHover" disablePadding>
+              <ListItemButton onClick={() => goToPage("/dashboard")}>
+                <ListItemIcon>
+                  <DashboardIcon sx={{ color: "#ffff" }} />
+                </ListItemIcon>
+                <ListItemText primary="Dashboard" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem className="listHover" disablePadding>
+              <ListItemButton onClick={() => goToPage("/users")}>
+                <ListItemIcon>
+                  <PersonAddIcon sx={{ color: "#ffff" }} />
+                </ListItemIcon>
+                <ListItemText primary="Users" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem className="listHover" disablePadding>
+              <ListItemButton onClick={() => goToPage("/addProducts")}>
+                <ListItemIcon>
+                  <ReportProblemIcon sx={{ color: "#ffff" }} />
+                </ListItemIcon>
+                <ListItemText primary="Complaints" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem className="listHover" disablePadding>
+              <ListItemButton onClick={() => goToPage("/orderList")}>
+                <ListItemIcon>
+                  <DensitySmallIcon sx={{ color: "#ffff" }} />
+                </ListItemIcon>
+                <ListItemText primary="Blogs" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem className="listHover" disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <AccountBoxIcon sx={{ color: "#ffff" }} />
+                </ListItemIcon>
+                <ListItemText primary="Account" />
+              </ListItemButton>
+            </ListItem>
 
-        <List>
-          <ListItem className="listHover" disablePadding>
-            <ListItemButton onClick={() => goToPage("/dashboard")}>
-              <ListItemIcon>
-                <DashboardIcon sx={{ color: "#ffff" }} />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem className="listHover" disablePadding>
-            <ListItemButton onClick={() => goToPage("/customers")}>
-              <ListItemIcon>
-                <PersonAddIcon sx={{ color: "#ffff" }} />
-              </ListItemIcon>
-              <ListItemText primary="Users" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem className="listHover" disablePadding>
-            <ListItemButton onClick={() => goToPage("/addProducts")}>
-              <ListItemIcon>
-                <ReportProblemIcon sx={{ color: "#ffff" }} />
-              </ListItemIcon>
-              <ListItemText primary="Complaints" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem className="listHover" disablePadding>
-            <ListItemButton onClick={() => goToPage("/orderList")}>
-              <ListItemIcon>
-                <DensitySmallIcon sx={{ color: "#ffff" }} />
-              </ListItemIcon>
-              <ListItemText primary="Blogs" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem className="listHover" disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <AccountBoxIcon sx={{ color: "#ffff" }} />
-              </ListItemIcon>
-              <ListItemText primary="Account" />
-            </ListItemButton>
-          </ListItem>
+            <ListItem className="listHover" disablePadding>
+              <ListItemButton onClick={() => Logout("/login")}>
+                <ListItemIcon>
+                  <LockIcon sx={{ color: "#ffff" }} />
+                </ListItemIcon>
+                <ListItemText primary="Logout" />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        ) : user.role === 1 ? (
+          <List>
+            <ListItem className="listHover" disablePadding>
+              <ListItemButton onClick={() => goToPage("/CustomerComplaints")}>
+                <ListItemIcon>
+                  <ReportProblemIcon sx={{ color: "#ffff" }} />
+                </ListItemIcon>
+                <ListItemText primary="My Complaints" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem className="listHover" disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <AccountBoxIcon sx={{ color: "#ffff" }} />
+                </ListItemIcon>
+                <ListItemText primary="Account" />
+              </ListItemButton>
+            </ListItem>
 
-          <ListItem className="listHover" disablePadding>
-            <ListItemButton onClick={() => Logout("/login")}>
-              <ListItemIcon>
-                <LockIcon sx={{ color: "#ffff" }} />
-              </ListItemIcon>
-              <ListItemText primary="Logout" />
-            </ListItemButton>
-          </ListItem>
-        </List>
+            <ListItem className="listHover" disablePadding>
+              <ListItemButton onClick={() => Logout("/login")}>
+                <ListItemIcon>
+                  <LockIcon sx={{ color: "#ffff" }} />
+                </ListItemIcon>
+                <ListItemText primary="Logout" />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        ) : (
+          <List>
+            <ListItem className="listHover" disablePadding>
+              <ListItemButton onClick={() => goToPage("/CustomerComplaints")}>
+                <ListItemIcon>
+                  <ReportProblemIcon sx={{ color: "#ffff" }} />
+                </ListItemIcon>
+                <ListItemText primary="Complaints" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem className="listHover" disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <AccountBoxIcon sx={{ color: "#ffff" }} />
+                </ListItemIcon>
+                <ListItemText primary="Account" />
+              </ListItemButton>
+            </ListItem>
+
+            <ListItem className="listHover" disablePadding>
+              <ListItemButton onClick={() => Logout("/login")}>
+                <ListItemIcon>
+                  <LockIcon sx={{ color: "#ffff" }} />
+                </ListItemIcon>
+                <ListItemText primary="Logout" />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        )}
         <Divider sx={{ bgcolor: "white" }} />
         <Box component="div" sx={{ m: 5 }}>
           <Typography fontSize="22px" textAlign="center">
@@ -190,6 +257,7 @@ const Index = ({ children }) => {
           flexGrow: 1,
           bgcolor: "rgb(249, 250, 240)",
           p: 3,
+          minHeight: "100vh",
         }}
       >
         {children}

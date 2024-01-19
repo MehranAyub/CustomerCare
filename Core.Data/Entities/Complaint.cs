@@ -15,7 +15,6 @@ namespace Core.Data.Entities
         public string? AgentRemarks { get; set; } = string.Empty;
         public Guid? CustomerId { get; set; }
         public Guid? AgentId { get; set; }
-        public User User { get; set; }
         public ComplaintStatus Status { get; set; }
         public List<Image> Images { get; set; }=new List<Image>();
     }

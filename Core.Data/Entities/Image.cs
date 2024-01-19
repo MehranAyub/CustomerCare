@@ -13,11 +13,10 @@ namespace Core.Data.Entities
 
         [MaxLength]
         public string ImageData { get; set; }
-
         public Guid? ComplaintId { get; set; }
-        public Complaint Complaint { get; set; }
+        public Complaint? Complaint { get; set; }
         public Guid? BlogId { get; set; }
-        public Blog Blog { get; set; }
+        public Blog? Blog { get; set; }
         
     }
 }

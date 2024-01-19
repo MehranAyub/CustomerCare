@@ -38,6 +38,7 @@ import {
   Typography,
   InputAdornment,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -60,6 +61,9 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 function Customers() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const navigate = useNavigate();
+
   const [customerList, setCustomerList] = useState([]);
   const [name, setName] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
@@ -162,9 +166,12 @@ function Customers() {
   };
 
   useEffect(() => {
-    handleGetUsers();
+    if (user.role === 0) {
+      handleGetUsers();
+    } else {
+      navigate("/Login");
+    }
   }, []);
-
   const handleGetUsers = () => {
     axios
       .get("https://localhost:7268/api/User")
@@ -434,7 +441,7 @@ function Customers() {
               xs={12}
             >
               <Button autoFocus onClick={handleClose}>
-                No
+                Cancel
               </Button>
               <Typography textAlign="center" color="error">
                 {errorMessage}
