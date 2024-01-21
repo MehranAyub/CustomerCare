@@ -15,6 +15,7 @@ import OrderDetail from "./components/OrderDetail";
 import Dashboard from "./components/Dashboard";
 import UserOrders from "./components/UserOrders";
 import CustomerComplaints from "./components/CustomerComplaints";
+import AdminComplaints from "./components/AdminComplaints";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -26,6 +27,7 @@ root.render(
         <Route path="register" element={<Registration />} />
         <Route path="products" element={<Products />} />
         <Route path="CustomerComplaints" element={<CustomerComplaints />} />
+        <Route path="AdminComplaints" element={<AdminComplaints />} />
         <Route path="checkout" element={<Checkout />} />
         <Route path="users" element={<Customers />} />
         <Route path="addProducts" element={<AdminProductList />} />

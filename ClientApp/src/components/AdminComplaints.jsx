@@ -79,7 +79,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function CustomerComplaints() {
+function AdminComplaints() {
   const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
 
@@ -92,49 +92,6 @@ function CustomerComplaints() {
   const [openDetail, setOpenDetail] = React.useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [formData, setFormData] = useState({
-    type: "",
-    subject: "",
-    description: "",
-  });
-
-  const handleChange = (event) => {
-    setFormData({ ...formData, [event.target.name]: event.target.value });
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setErrorMessage("");
-    setIsLoading(true);
-    const data = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      data.append("files", files[i]);
-    }
-    data.append("type", formData.type);
-    data.append("subject", formData.subject);
-    data.append("description", formData.description);
-    data.append("customerId", user.id);
-    axios.defaults.headers.post["Content-Type"] = "application/json";
-
-    axios
-      .post("https://localhost:7268/api/Complaint/CreateComplaint", data)
-      .then(function (response) {
-        console.log(response);
-
-        if (response && response.data.status === 200) {
-          handleGetComplaints();
-          handleClose();
-        } else if (response.data.status == 403) {
-          setErrorMessage("Sorry , Found Error");
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-      })
-      .finally((res) => {
-        setIsLoading(false);
-      });
-  };
 
   const handleClose = () => {
     setOpenAdd(false);
@@ -160,21 +117,21 @@ function CustomerComplaints() {
   };
 
   useEffect(() => {
-    if (user != null && user.role === 1) {
+    if (user != null && user.role === 0) {
       handleGetComplaints();
     } else {
       navigate("/Login");
     }
   }, []);
 
+  useEffect(() => {
+    console.log("Selected Complaint", selectedComplaint);
+  }, [selectedComplaint]);
+
   const handleGetComplaints = () => {
-    console.log("userId", user.id);
     axios.defaults.headers.post["Content-Type"] = "text/plain";
     axios
-      .post(
-        "https://localhost:7268/api/Complaint/GetComplaintsByUserId?userId=" +
-          user.id
-      )
+      .get("https://localhost:7268/api/Complaint")
       .then((res) => {
         setComplaintList(res.data.entityList);
         setFoundComplaints(res.data.entityList);
@@ -188,21 +145,8 @@ function CustomerComplaints() {
   return (
     <Container maxWidth="lg" sx={{ mt: 12, height: "80vh" }}>
       <Card>
-        <Box
-          margin={2}
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Typography variant="h6">Complaints</Typography>
-          <Button
-            size="medium"
-            variant="contained"
-            onClick={() => setOpenAdd(true)}
-            startIcon={<AddIcon />}
-          >
-            Report
-          </Button>
+        <Box margin={2}>
+          <Typography variant="h6">Customer Complaints</Typography>
         </Box>
         <CardContent>
           <Box sx={{ maxWidth: 400 }}>
@@ -284,176 +228,29 @@ function CustomerComplaints() {
           </TableBody>
         </Table>
       </TableContainer>
-      <Dialog open={openAdd} onClose={handleClose} fullWidth>
-        <DialogTitle textAlign="center">Report a Problem</DialogTitle>
-        <DialogContent>
-          <Box component="form" onSubmit={handleSubmit} mt={1}>
-            <Grid container spacing={3} justifyContent="flex-start">
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel id="select">Type</InputLabel>
-                  <Select
-                    labelId="select"
-                    id="select"
-                    required
-                    value={formData.type}
-                    label="Type"
-                    name="type"
-                    onChange={handleChange}
-                  >
-                    {menuItems.map((item) => (
-                      <MenuItem value={item}>{item}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  name="subject"
-                  fullWidth
-                  label="Subject"
-                  size="small"
-                  required
-                  value={formData.subject}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextareaAutosize
-                  aria-label="empty textarea"
-                  placeholder="Description"
-                  id={"description"}
-                  name={"description"}
-                  minRows={5}
-                  style={{ width: "100%" }}
-                  onChange={handleChange}
-                  value={formData.description}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={12}>
-                <label htmlFor="images">
-                  <TextField
-                    type="file"
-                    sx={{ display: "none" }}
-                    id="images"
-                    name="images"
-                    label="Images"
-                    fullWidth
-                    autoComplete="family-name"
-                    variant="standard"
-                    onChange={(e) => {
-                      if (e && e.target.files.length > 0) {
-                        var file = e.target.files[0];
-                        const newFiles = [...files, file];
-                        setFiles(newFiles);
-                      }
-                    }}
-                  />
-
-                  <Button variant="contained" size="small" component="span">
-                    Upload Images
-                  </Button>
-                </label>
-
-                <br />
-                {files && files?.length > 0 ? (
-                  files?.map((file, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        position: "relative",
-                        display: "inline-block",
-                      }}
-                    >
-                      <img
-                        style={{
-                          width: "150px",
-                          height: "100px",
-                          marginTop: "10px",
-                          borderRadius: 5,
-                          marginLeft: 3,
-                        }}
-                        alt="preview image"
-                        src={URL.createObjectURL(file)}
-                      />
-
-                      <IconButton
-                        size="small"
-                        style={{
-                          position: "absolute",
-                          top: 6,
-                          right: -3,
-                          backgroundColor: "white",
-                        }}
-                        onClick={() => {
-                          setFiles((prevFiles) =>
-                            prevFiles.filter(
-                              (_, fileIndex) => fileIndex !== index
-                            )
-                          );
-                        }}
-                      >
-                        <CloseIcon
-                          sx={{
-                            color: "rgb(56, 55, 110)",
-                            fontSize: "13px",
-                          }}
-                        />
-                      </IconButton>
-                    </div>
-                  ))
-                ) : (
-                  <Typography>No files selected </Typography>
-                )}
-              </Grid>
-            </Grid>
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-              mt={3}
-            >
-              <Button autoFocus onClick={handleClose}>
-                Cancel
-              </Button>
-              <Typography textAlign="center" color="error">
-                {errorMessage}
-              </Typography>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? (
-                  <CircularProgress size="1rem"></CircularProgress>
-                ) : (
-                  "Submit"
-                )}
-              </Button>
-            </Box>
-          </Box>
-        </DialogContent>
-      </Dialog>
-
       <Dialog open={openDetail} onClose={handleClose} fullWidth>
         <DialogTitle textAlign="center">Complaint Detail</DialogTitle>
         <DialogContent>
           <Box mt={1}>
             <Grid container spacing={3} justifyContent="flex-start">
               <Grid item xs={12}>
-                <Typography>Type : {selectedComplaint.type}</Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography>Subject : {selectedComplaint.subject}</Typography>
-              </Grid>
-              <Grid item xs={12}>
                 <Typography>
-                  Description : {selectedComplaint.description}
+                  <b>Type :</b> {selectedComplaint.type}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
                 <Typography>
-                  Status :
+                  <b>Subject :</b> {selectedComplaint.subject}
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  <b> Description :</b> {selectedComplaint.description}
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  <b> Status :</b>
                   <span style={{ marginLeft: "10px" }}>
                     {selectedComplaint.status === 0 ? (
                       <Chip color="primary" label="Pending" />
@@ -471,8 +268,26 @@ function CustomerComplaints() {
               </Grid>
               <Grid item xs={12}>
                 <Typography>
-                  Agent Remarks : {selectedComplaint.agentRemarks}
+                  <b> Agent Remarks :</b> {selectedComplaint.agentRemarks}
                 </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  <b>Additional Data</b>
+                </Typography>
+              </Grid>
+              <Grid>
+                {selectedComplaint.images && selectedComplaint.images.length > 0
+                  ? selectedComplaint.images.map((item, index) => {
+                      <img
+                        id={index}
+                        width="100%"
+                        height="100%"
+                        src={"https://localhost:7268/Assets/" + item.imageData}
+                        alt="Error"
+                      />;
+                    })
+                  : "No Additional Info."}
               </Grid>
             </Grid>
 
@@ -495,4 +310,4 @@ function CustomerComplaints() {
   );
 }
 
-export default CustomerComplaints;
+export default AdminComplaints;

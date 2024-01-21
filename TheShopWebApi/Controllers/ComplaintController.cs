@@ -25,7 +25,7 @@ namespace TheCustomerCareWebApi.Controllers
         {
             try
             {
-                var complaints = await _context.Complaints.ToListAsync();
+                var complaints = await _context.Complaints.Include(n=>n.Images).ToListAsync();
                 if (complaints != null)
                 {
                     return new PayloadCustom<Complaint>()

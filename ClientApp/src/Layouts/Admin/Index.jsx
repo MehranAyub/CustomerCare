@@ -153,7 +153,7 @@ const Index = ({ children }) => {
               </ListItemButton>
             </ListItem>
             <ListItem className="listHover" disablePadding>
-              <ListItemButton onClick={() => goToPage("/addProducts")}>
+              <ListItemButton onClick={() => goToPage("/AdminComplaints")}>
                 <ListItemIcon>
                   <ReportProblemIcon sx={{ color: "#ffff" }} />
                 </ListItemIcon>
