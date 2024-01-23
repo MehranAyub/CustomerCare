@@ -219,5 +219,75 @@ namespace TheCustomerCareWebApi.Controllers
                 };
             }
         }
+        [HttpGet("GetAllAgents")]
+        public async Task<PayloadCustom<User>> GetAllAgents()
+        {
+            try
+            {
+                var users = await _context.Users.Where(n => n.Role == Role.Agent).ToListAsync();
+                if (users != null)
+                {
+                    return new PayloadCustom<User>()
+                    {
+                        EntityList = users,
+                        Status = (int)HttpStatusCode.OK,
+                    };
+                }
+                else
+                {
+                    return new PayloadCustom<User>()
+                    {
+
+                        Status = (int)HttpStatusCode.NoContent,
+                    }; ;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new PayloadCustom<User>()
+                {
+                    Message = ex.Message,
+                    Status = (int)HttpStatusCode.InternalServerError,
+                };
+            }
+        }
+
+        [HttpGet("GetDashboardStats")]
+        public async Task<PayloadCustom<User>> GetDashboardStats()
+        {
+            try
+            {
+                var users = await _context.Users.Where(n => n.Role == Role.Agent).ToListAsync();
+                if (users != null)
+                {
+                    return new PayloadCustom<User>()
+                    {
+                        EntityList = users,
+                        Status = (int)HttpStatusCode.OK,
+                    };
+                }
+                else
+                {
+                    return new PayloadCustom<User>()
+                    {
+
+                        Status = (int)HttpStatusCode.NoContent,
+                    }; ;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new PayloadCustom<User>()
+                {
+                    Message = ex.Message,
+                    Status = (int)HttpStatusCode.InternalServerError,
+                };
+            }
+        }
+
+
+
     }
 }

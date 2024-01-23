@@ -15,9 +15,10 @@ import {
   DialogContent,
   DialogTitle,
   Button,
-  CircularProgress,
   TextareaAutosize,
   IconButton,
+  Select,
+  CircularProgress,
 } from "@mui/material";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
@@ -27,11 +28,6 @@ import { useEffect } from "react";
 import Paper from "@mui/material/Paper";
 import SearchIcon from "@mui/icons-material/Search";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import AddIcon from "@mui/icons-material/Add";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
   Card,
@@ -84,6 +80,7 @@ function AdminComplaints() {
   const navigate = useNavigate();
 
   const [complaintList, setComplaintList] = useState([]);
+  const [agentList, setAgentList] = useState([]);
   const [files, setFiles] = useState([]);
   const [name, setName] = useState("");
   const [selectedComplaint, setSelectedComplaint] = useState({});
@@ -92,10 +89,51 @@ function AdminComplaints() {
   const [openDetail, setOpenDetail] = React.useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [selectedAgent, setSelectedAgent] = useState();
 
   const handleClose = () => {
     setOpenAdd(false);
     setOpenDetail(false);
+  };
+  const handleChange = (event) => {
+    setSelectedAgent(event.target.value);
+  };
+  const handleAssignAgent = (event) => {
+    if (selectedComplaint !== null && selectedAgent !== null) {
+      const assignAgentRequest = {
+        agentId: selectedAgent,
+        complaintId: selectedComplaint.id,
+      };
+      setIsLoading(true);
+      axios.defaults.headers.post["Content-Type"] = "application/json";
+      axios
+        .put(
+          "https://localhost:7268/api/Complaint/AssignAgent",
+          JSON.stringify(assignAgentRequest),
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        .then(function (response) {
+          console.log(response);
+
+          if (response && response.data.status === 200) {
+            console.log("Agent Assigned Successfully");
+            setOpenDetail(false);
+            handleGetComplaints();
+          } else if (response.data.status == 403) {
+            setErrorMessage("Got Error while Assigning Agent*");
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        })
+        .finally((res) => {
+          setIsLoading(false);
+        });
+    }
   };
 
   const filter = (e) => {
@@ -119,6 +157,7 @@ function AdminComplaints() {
   useEffect(() => {
     if (user != null && user.role === 0) {
       handleGetComplaints();
+      handleGetAllAgents();
     } else {
       navigate("/Login");
     }
@@ -136,6 +175,22 @@ function AdminComplaints() {
         setComplaintList(res.data.entityList);
         setFoundComplaints(res.data.entityList);
         console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const handleGetAllAgents = () => {
+    axios.defaults.headers.post["Content-Type"] = "text/plain";
+    axios
+      .get("https://localhost:7268/api/User/GetAllAgents")
+      .then((res) => {
+        if (res.data.status === 200) {
+          console.log("Agents List", res.data.entityList);
+          setAgentList(res.data.entityList);
+        }
+        console.log("Agents res", res);
       })
       .catch((err) => {
         console.log(err);
@@ -194,7 +249,7 @@ function AdminComplaints() {
                     {item.status === 0 ? (
                       <Chip color="primary" label="Pending" />
                     ) : item.status === 1 ? (
-                      <Chip color="info" label="In Progress" />
+                      <Chip color="secondary" label="In Progress" />
                     ) : item.status === 2 ? (
                       <Chip color="success" label="Resolved" />
                     ) : item.status === 3 ? (
@@ -209,6 +264,7 @@ function AdminComplaints() {
                       onClick={() => {
                         setSelectedComplaint(item);
                         setOpenDetail(true);
+                        setSelectedAgent(item.agentId);
                       }}
                     />
                     {/* |&nbsp;
@@ -255,7 +311,7 @@ function AdminComplaints() {
                     {selectedComplaint.status === 0 ? (
                       <Chip color="primary" label="Pending" />
                     ) : selectedComplaint.status === 1 ? (
-                      <Chip color="info" label="In Progress" />
+                      <Chip color="secondary" label="In Progress" />
                     ) : selectedComplaint.status === 2 ? (
                       <Chip color="success" label="Resolved" />
                     ) : selectedComplaint.status === 3 ? (
@@ -264,7 +320,35 @@ function AdminComplaints() {
                       ""
                     )}
                   </span>
+                  <span style={{ marginLeft: "20px", color: "red" }}>
+                    {selectedComplaint.status === 0
+                      ? "Agent Not Assigned*"
+                      : ""}{" "}
+                  </span>
                 </Typography>
+              </Grid>
+              <Grid mt={1} item xs={3}>
+                <Typography>
+                  <b> Agent :</b>
+                </Typography>
+              </Grid>
+              <Grid item xs={9}>
+                <Select
+                  label="Agent"
+                  name="agent"
+                  size="small"
+                  value={selectedAgent}
+                  fullWidth
+                  onChange={handleChange}
+                >
+                  {agentList && agentList.length > 0
+                    ? agentList.map((item) => (
+                        <MenuItem key={item.id} value={item.id}>
+                          {item.firstName + " " + item.lastName}
+                        </MenuItem>
+                      ))
+                    : ""}
+                </Select>
               </Grid>
               <Grid item xs={12}>
                 <Typography>
@@ -276,17 +360,15 @@ function AdminComplaints() {
                   <b>Additional Data</b>
                 </Typography>
               </Grid>
-              <Grid>
+              <Grid item xs={12} width="100%">
                 {selectedComplaint.images && selectedComplaint.images.length > 0
-                  ? selectedComplaint.images.map((item, index) => {
+                  ? selectedComplaint.images.map((img, index) => (
                       <img
-                        id={index}
-                        width="100%"
-                        height="100%"
-                        src={"https://localhost:7268/Assets/" + item.imageData}
-                        alt="Error"
-                      />;
-                    })
+                        key={index}
+                        style={{ width: "200px" }}
+                        src={"https://localhost:7268/Assets/" + img.imageData}
+                      />
+                    ))
                   : "No Additional Info."}
               </Grid>
             </Grid>
@@ -294,13 +376,18 @@ function AdminComplaints() {
             <Box
               sx={{
                 display: "flex",
-                justifyContent: "flex-end",
+                justifyContent: "space-between",
                 alignItems: "center",
               }}
               mt={3}
             >
-              <Button autoFocus onClick={handleClose}>
-                Close
+              <Button onClick={handleClose}>Close</Button>
+              <Button disabled={isLoading} onClick={handleAssignAgent}>
+                {isLoading ? (
+                  <CircularProgress size="1rem"></CircularProgress>
+                ) : (
+                  "Save"
+                )}
               </Button>
             </Box>
           </Box>

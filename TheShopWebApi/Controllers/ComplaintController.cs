@@ -170,31 +170,43 @@ namespace TheCustomerCareWebApi.Controllers
             }
 
         }
-
-        private IEnumerable<string> ProcessFiles(IEnumerable<IFormFile> files, string sourcePath, string destinationPath, string urlBase)
+        [HttpPut("AssignAgent")]
+        public async Task<PayloadCustom<string>> AssignAgent([FromBody] AssignAgentRequest request)
         {
-            List<string> fileUrls = new List<string>();
-
-            foreach (var file in files)
+            try
             {
-                if (file.Length > 0)
+                var complaint=_context.Complaints.Where(n=>n.Id==request.ComplaintId).FirstOrDefault();
+                if (complaint != null)
                 {
-                    var fileName = Path.GetFileName(file.FileName);
-                    var sourceFilePath = Path.Combine(sourcePath, fileName);
-                    var destinationFilePath = Path.Combine(destinationPath, fileName);
-
-                    // Move the file
-                    System.IO.File.Move(sourceFilePath, destinationFilePath);
-
-                    // Generate URL
-                    var fileUrl = Path.Combine(urlBase, fileName);
-                    fileUrls.Add(fileUrl);
+                    complaint.AgentId= request.AgentId;
+                    complaint.Status = ComplaintStatus.InProgress;
+                    _context.Update(complaint);
+                    var data = await _context.SaveChangesAsync();
+                    if (data > 0)
+                    {
+                        return new PayloadCustom<string>()
+                        {
+                            Message="Agent Assigned",
+                            Status = (int)HttpStatusCode.OK,
+                        };
+                    }
                 }
+               
+                return new PayloadCustom<string>()
+                {
+                    Message = "Error while assigning agent",
+                    Status = (int)HttpStatusCode.NotFound,
+                };
             }
-
-            return fileUrls;
+            catch (Exception ex)
+            {
+                return new PayloadCustom<string>()
+                {
+                    Message = ex.Message,
+                    Status = (int)HttpStatusCode.InternalServerError,
+                };
+            }
         }
-
 
 
 
