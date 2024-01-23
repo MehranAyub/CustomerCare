@@ -1,6 +1,6 @@
 import {
-  Box,
   Avatar,
+  Box,
   Card,
   CardContent,
   Grid,
@@ -8,9 +8,10 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import LaunchIcon from "@mui/icons-material/Launch";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import ReportProblemIcon from "@mui/icons-material/ReportProblem";
+import { pink } from "@mui/material/colors";
 
-export const TotalProducts = (props) => {
+export const TotalComplaints = (props) => {
   const navigate = useNavigate();
   return (
     <Card>
@@ -18,7 +19,7 @@ export const TotalProducts = (props) => {
         <Grid container spacing={3} sx={{ justifyContent: "space-between" }}>
           <Grid item>
             <Typography color="textSecondary" gutterBottom variant="overline">
-              TOTAL Products
+              TOTAL Complaints
             </Typography>
             <Typography color="textPrimary" variant="h4">
               {props.count}
@@ -27,12 +28,12 @@ export const TotalProducts = (props) => {
           <Grid item>
             <Avatar
               sx={{
-                backgroundColor: "primary.main",
+                bgcolor: pink[500],
                 height: 56,
                 width: 56,
               }}
             >
-              <ShoppingCartIcon />
+              <ReportProblemIcon />
             </Avatar>
           </Grid>
         </Grid>
@@ -48,11 +49,11 @@ export const TotalProducts = (props) => {
             color="success"
             sx={{ cursor: "pointer" }}
             onClick={() => {
-              navigate("/addProducts");
+              navigate("/adminComplaints");
             }}
           />
           <Typography color="textSecondary" variant="caption">
-            &nbsp; Go to Products
+            &nbsp; Go to Complaints
           </Typography>
         </Box>
       </CardContent>

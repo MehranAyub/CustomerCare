@@ -254,32 +254,24 @@ namespace TheCustomerCareWebApi.Controllers
         }
 
         [HttpGet("GetDashboardStats")]
-        public async Task<PayloadCustom<User>> GetDashboardStats()
+        public async Task<PayloadCustom<DashboardStatsResponse>> GetDashboardStats()
         {
             try
             {
-                var users = await _context.Users.Where(n => n.Role == Role.Agent).ToListAsync();
-                if (users != null)
-                {
-                    return new PayloadCustom<User>()
-                    {
-                        EntityList = users,
-                        Status = (int)HttpStatusCode.OK,
-                    };
-                }
-                else
-                {
-                    return new PayloadCustom<User>()
-                    {
+                var agents = await _context.Users.Where(n => n.Role == Role.Agent).CountAsync();
+                var customers = await _context.Users.Where(n => n.Role == Role.Customer).CountAsync();
+                var complaints = await _context.Complaints.ToListAsync();
 
-                        Status = (int)HttpStatusCode.NoContent,
-                    }; ;
-                }
-
+                var stats=new DashboardStatsResponse() { Agents = agents, Complaints = complaints.Count(), Customers = customers, Pending = complaints.Where(n => n.Status == ComplaintStatus.Pending).Count(), InProgress = complaints.Where(n => n.Status == ComplaintStatus.InProgress).Count(), Resolved = complaints.Where(n => n.Status == ComplaintStatus.Resolved).Count(), Cancelled = complaints.Where(n => n.Status == ComplaintStatus.Cancelled).Count() };
+                return new PayloadCustom<DashboardStatsResponse>()
+                {
+                    Entity = stats,
+                    Status = (int)HttpStatusCode.OK,
+                };
             }
             catch (Exception ex)
             {
-                return new PayloadCustom<User>()
+                return new PayloadCustom<DashboardStatsResponse>()
                 {
                     Message = ex.Message,
                     Status = (int)HttpStatusCode.InternalServerError,

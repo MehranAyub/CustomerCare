@@ -94,7 +94,7 @@ code {
   text-transform: uppercase;
 }
 .main {
-  max-height: 80vh;
+  max-height: 40vh;
   margin: 2rem;
   display: flex;
   flex-direction: column;

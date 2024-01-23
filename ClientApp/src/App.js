@@ -17,6 +17,7 @@ import CustomerComplaints from "./components/CustomerComplaints";
 import AdminComplaints from "./components/AdminComplaints";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import AgentComplaints from "./components/AgentComplaints";
 const App = () => {
   const [value, setValue] = useState([]);
   const providerValue = useMemo(() => ({ value, setValue }), [value, setValue]);
@@ -34,6 +35,7 @@ const App = () => {
                   path="CustomerComplaints"
                   element={<CustomerComplaints />}
                 />
+                <Route path="AgentComplaints" element={<AgentComplaints />} />
                 <Route path="AdminComplaints" element={<AdminComplaints />} />
                 <Route path="checkout" element={<Checkout />} />
                 <Route path="users" element={<Customers />} />

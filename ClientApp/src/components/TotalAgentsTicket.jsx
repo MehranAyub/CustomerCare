@@ -8,10 +8,9 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import LaunchIcon from "@mui/icons-material/Launch";
-import { pink } from "@mui/material/colors";
-import LayersIcon from "@mui/icons-material/Layers";
+import PeopleIcon from "@mui/icons-material/PeopleOutlined";
 
-export const TotalOrders = (props) => {
+export const TotalAgents = (props) => {
   const navigate = useNavigate();
   return (
     <Card>
@@ -19,7 +18,7 @@ export const TotalOrders = (props) => {
         <Grid container spacing={3} sx={{ justifyContent: "space-between" }}>
           <Grid item>
             <Typography color="textSecondary" gutterBottom variant="overline">
-              TOTAL Orders
+              TOTAL Agents
             </Typography>
             <Typography color="textPrimary" variant="h4">
               {props.count}
@@ -28,12 +27,12 @@ export const TotalOrders = (props) => {
           <Grid item>
             <Avatar
               sx={{
-                bgcolor: pink[500],
+                backgroundColor: "success.main",
                 height: 56,
                 width: 56,
               }}
             >
-              <LayersIcon />
+              <PeopleIcon />
             </Avatar>
           </Grid>
         </Grid>
@@ -49,11 +48,11 @@ export const TotalOrders = (props) => {
             color="success"
             sx={{ cursor: "pointer" }}
             onClick={() => {
-              navigate("/orderList");
+              navigate("/users");
             }}
           />
           <Typography color="textSecondary" variant="caption">
-            &nbsp; Go to Orders
+            &nbsp; Go to Agents
           </Typography>
         </Box>
       </CardContent>

@@ -6,11 +6,11 @@ Chart.register(CategoryScale, LinearScale, BarElement);
 
 function BarChart(props) {
   const labels = [
-    "Total Orders",
+    "Total Complaints",
     "Pending",
+    "InProgress",
+    "Resolved",
     "Cancelled",
-    "Approved",
-    "Delivered",
   ];
   const data = {
     labels: labels,
@@ -18,18 +18,18 @@ function BarChart(props) {
       {
         label: "dataset",
         data: [
-          props.object.orders,
-          props.object.pendingOrders,
-          props.object.cancelledOrders,
-          props.object.approvedOrders,
-          props.object.deliveredOrders,
+          props.object.complaints,
+          props.object.pending,
+          props.object.inProgress,
+          props.object.resolved,
+          props.object.cancelled,
         ],
         backgroundColor: [
           "rgba(255, 159, 64, 0.7)",
           "rgba(255, 205, 86, 0.7)",
-          "rgba(255, 99, 132, 1)",
           "rgba(0, 230, 0,0.7)",
           "rgba(54, 162, 235, 0.7)",
+          "rgba(255, 99, 132, 1)",
         ],
         borderWidth: 1,
       },
@@ -38,7 +38,7 @@ function BarChart(props) {
 
   return (
     <div className="main">
-      <h2>Order Analysis</h2>
+      <h2>Complaint Analysis</h2>
       <Bar
         data={data}
         options={{

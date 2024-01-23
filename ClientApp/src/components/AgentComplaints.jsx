@@ -77,7 +77,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function CustomerComplaints() {
+function AgentComplaints() {
   const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
 
@@ -100,38 +100,41 @@ function CustomerComplaints() {
     setFormData({ ...formData, [event.target.name]: event.target.value });
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setErrorMessage("");
-    setIsLoading(true);
-    const data = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      data.append("files", files[i]);
+  const handleAssignAgent = (event) => {
+    if (selectedComplaint !== null) {
+      const assignAgentRequest = {
+        complaintId: selectedComplaint.id,
+      };
+      setIsLoading(true);
+      axios.defaults.headers.post["Content-Type"] = "application/json";
+      axios
+        .put(
+          "https://localhost:7268/api/Complaint/AssignAgent",
+          JSON.stringify(assignAgentRequest),
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        .then(function (response) {
+          console.log(response);
+
+          if (response && response.data.status === 200) {
+            console.log("Agent Assigned Successfully");
+            setOpenDetail(false);
+            handleGetComplaints();
+          } else if (response.data.status == 403) {
+            setErrorMessage("Got Error while Assigning Agent*");
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        })
+        .finally((res) => {
+          setIsLoading(false);
+        });
     }
-    data.append("type", formData.type);
-    data.append("subject", formData.subject);
-    data.append("description", formData.description);
-    data.append("customerId", user.id);
-    axios.defaults.headers.post["Content-Type"] = "application/json";
-
-    axios
-      .post("https://localhost:7268/api/Complaint/CreateComplaint", data)
-      .then(function (response) {
-        console.log(response);
-
-        if (response && response.data.status === 200) {
-          handleGetComplaints();
-          handleClose();
-        } else if (response.data.status == 403) {
-          setErrorMessage("Sorry , Found Error");
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-      })
-      .finally((res) => {
-        setIsLoading(false);
-      });
   };
 
   const handleClose = () => {
@@ -158,7 +161,7 @@ function CustomerComplaints() {
   };
 
   useEffect(() => {
-    if (user != null && user.role === 1) {
+    if (user != null && user.role === 2) {
       handleGetComplaints();
     } else {
       navigate("/Login");
@@ -193,14 +196,6 @@ function CustomerComplaints() {
           alignItems="center"
         >
           <Typography variant="h6">Complaints</Typography>
-          <Button
-            size="medium"
-            variant="contained"
-            onClick={() => setOpenAdd(true)}
-            startIcon={<AddIcon />}
-          >
-            Report
-          </Button>
         </Box>
         <CardContent>
           <Box sx={{ maxWidth: 400 }}>
@@ -274,156 +269,6 @@ function CustomerComplaints() {
           </TableBody>
         </Table>
       </TableContainer>
-      <Dialog open={openAdd} onClose={handleClose} fullWidth>
-        <DialogTitle textAlign="center">Report a Problem</DialogTitle>
-        <DialogContent>
-          <Box component="form" onSubmit={handleSubmit} mt={1}>
-            <Grid container spacing={3} justifyContent="flex-start">
-              <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel id="select">Type</InputLabel>
-                  <Select
-                    labelId="select"
-                    id="select"
-                    required
-                    value={formData.type}
-                    label="Type"
-                    name="type"
-                    onChange={handleChange}
-                  >
-                    {menuItems.map((item) => (
-                      <MenuItem value={item}>{item}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  name="subject"
-                  fullWidth
-                  label="Subject"
-                  size="small"
-                  required
-                  value={formData.subject}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextareaAutosize
-                  aria-label="empty textarea"
-                  placeholder="Description"
-                  id={"description"}
-                  name={"description"}
-                  minRows={5}
-                  style={{ width: "100%" }}
-                  onChange={handleChange}
-                  value={formData.description}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={12}>
-                <label htmlFor="images">
-                  <TextField
-                    type="file"
-                    sx={{ display: "none" }}
-                    id="images"
-                    name="images"
-                    label="Images"
-                    fullWidth
-                    autoComplete="family-name"
-                    variant="standard"
-                    onChange={(e) => {
-                      if (e && e.target.files.length > 0) {
-                        var file = e.target.files[0];
-                        const newFiles = [...files, file];
-                        setFiles(newFiles);
-                      }
-                    }}
-                  />
-
-                  <Button variant="contained" size="small" component="span">
-                    Upload Images
-                  </Button>
-                </label>
-
-                <br />
-                {files && files?.length > 0 ? (
-                  files?.map((file, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        position: "relative",
-                        display: "inline-block",
-                      }}
-                    >
-                      <img
-                        style={{
-                          width: "150px",
-                          height: "100px",
-                          marginTop: "10px",
-                          borderRadius: 5,
-                          marginLeft: 3,
-                        }}
-                        alt="preview image"
-                        src={URL.createObjectURL(file)}
-                      />
-
-                      <IconButton
-                        size="small"
-                        style={{
-                          position: "absolute",
-                          top: 6,
-                          right: -3,
-                          backgroundColor: "white",
-                        }}
-                        onClick={() => {
-                          setFiles((prevFiles) =>
-                            prevFiles.filter(
-                              (_, fileIndex) => fileIndex !== index
-                            )
-                          );
-                        }}
-                      >
-                        <CloseIcon
-                          sx={{
-                            color: "rgb(56, 55, 110)",
-                            fontSize: "13px",
-                          }}
-                        />
-                      </IconButton>
-                    </div>
-                  ))
-                ) : (
-                  <Typography>No files selected </Typography>
-                )}
-              </Grid>
-            </Grid>
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-              mt={3}
-            >
-              <Button autoFocus onClick={handleClose}>
-                Cancel
-              </Button>
-              <Typography textAlign="center" color="error">
-                {errorMessage}
-              </Typography>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? (
-                  <CircularProgress size="1rem"></CircularProgress>
-                ) : (
-                  "Submit"
-                )}
-              </Button>
-            </Box>
-          </Box>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={openDetail} onClose={handleClose} fullWidth>
         <DialogTitle textAlign="center">Complaint Detail</DialogTitle>
@@ -468,22 +313,46 @@ function CustomerComplaints() {
                   </span>
                 </Typography>
               </Grid>
+
               <Grid item xs={12}>
                 <Typography>
-                  <b> Agent Remarks :</b> {selectedComplaint.agentRemarks}
+                  <b> Your Remarks :</b> {selectedComplaint.agentRemarks}
                 </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  <b>Additional Data</b>
+                </Typography>
+              </Grid>
+              <Grid item xs={12} width="100%">
+                {selectedComplaint.images && selectedComplaint.images.length > 0
+                  ? selectedComplaint.images.map((img, index) => (
+                      <img
+                        key={index}
+                        style={{ width: "200px" }}
+                        src={"https://localhost:7268/Assets/" + img.imageData}
+                      />
+                    ))
+                  : "No Additional Info."}
               </Grid>
             </Grid>
 
             <Box
               sx={{
                 display: "flex",
-                justifyContent: "flex-end",
+                justifyContent: "space-between",
                 alignItems: "center",
               }}
               mt={3}
             >
               <Button onClick={handleClose}>Close</Button>
+              <Button disabled={isLoading} onClick={handleAssignAgent}>
+                {isLoading ? (
+                  <CircularProgress size="1rem"></CircularProgress>
+                ) : (
+                  "Save"
+                )}
+              </Button>
             </Box>
           </Box>
         </DialogContent>
@@ -492,4 +361,4 @@ function CustomerComplaints() {
   );
 }
 
-export default CustomerComplaints;
+export default AgentComplaints;

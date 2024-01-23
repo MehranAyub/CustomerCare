@@ -48,7 +48,7 @@ export const TotalCustomers = (props) => {
             color="success"
             sx={{ cursor: "pointer" }}
             onClick={() => {
-              navigate("/customers");
+              navigate("/users");
             }}
           />
           <Typography color="textSecondary" variant="caption">

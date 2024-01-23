@@ -59,7 +59,7 @@ namespace TheCustomerCareWebApi.Controllers
             try
             {
                 var Id=new Guid(userId);
-                var complaints = await _context.Complaints.Where(n=>n.CustomerId== Id || n.AgentId== Id).ToListAsync();
+                var complaints = await _context.Complaints.Where(n=>n.CustomerId== Id || n.AgentId== Id).Include(n=>n.Images).ToListAsync();
                 if (complaints != null)
                 {
                     return new PayloadCustom<Complaint>()

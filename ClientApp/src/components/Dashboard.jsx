@@ -1,31 +1,47 @@
 import React from "react";
 import { Container, Grid, Box } from "@mui/material";
 import { TotalCustomers } from "./TotalCustomersTicket";
-import { TotalOrders } from "./TotalOrdersTicket";
-import { DeliveredOrders } from "./DeliveredOrdersTicket";
-import { TotalProducts } from "./TotalProducts";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import OrderList from "./OrderList";
 import BarChart from "./BarChart";
+import { TotalAgents } from "./TotalAgentsTicket";
+import { TotalComplaints } from "./TotalComplaints";
+import PageLoader from "./PageLoader";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const navigate = useNavigate();
   const [DashboardData, setDashboardData] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
+    if (user != null && user.role === 0) {
+      handleGetStats();
+    } else {
+      navigate("/Login");
+    }
+  }, []);
+
+  const handleGetStats = () => {
+    setIsLoading(true);
     axios
-      .get("https://localhost:7268/api/Product/DashboardCall")
+      .get("https://localhost:7268/api/User/GetDashboardStats")
       .then((res) => {
-        setDashboardData(res.data);
         console.log(res.data);
-        console.log(DashboardData);
+        if (res.data.status === 200) {
+        }
+        setDashboardData(res.data.entity);
+        setIsLoading(false);
       })
       .catch((err) => {
         console.log(err);
+        setIsLoading(false);
       });
-  }, []);
-
+  };
   return (
     <Container maxWidth="lg" sx={{ mt: 8 }}>
+      <PageLoader isLoading={isLoading}></PageLoader>
       <Box
         component="main"
         sx={{
@@ -35,39 +51,19 @@ function Dashboard() {
       >
         <Container maxWidth={false}>
           <Grid container spacing={3}>
-            <Grid item lg={3} sm={6} xl={3} xs={12}>
+            <Grid item md={4} xs={12}>
               <TotalCustomers count={DashboardData.customers} />
             </Grid>
-            <Grid item xl={3} lg={3} sm={6} xs={12}>
-              <TotalOrders count={DashboardData.orders} />
+            <Grid item md={4} xs={12}>
+              <TotalAgents count={DashboardData.agents} />
             </Grid>
-            <Grid item xl={3} lg={3} sm={6} xs={12}>
-              <DeliveredOrders
-                count={
-                  (DashboardData.deliveredOrders / DashboardData.orders) * 100
-                }
-              />
-            </Grid>
-            <Grid item xl={3} lg={3} sm={6} xs={12}>
-              <TotalProducts
-                count={DashboardData.products}
-                sx={{ height: "100%" }}
-              />
-            </Grid>
-            {/* <Grid item lg={8} md={12} xl={9} xs={12}></Grid> */}
-            {/* <Grid item lg={4} md={6} xl={3} xs={12}>
-              <TotalCustomers sx={{ height: "100%" }} /> 
-            </Grid> */}
-            {/* <Grid item lg={4} md={6} xl={3} xs={12}>
-              <TotalCustomers sx={{ height: "100%" }} />
-            </Grid> */}
-            <Grid mt={5} item lg={12} md={12} xl={12} xs={12}>
-              <BarChart object={DashboardData} />
-            </Grid>
-            <Grid item lg={8} md={8} xl={12} xs={12}>
-              <OrderList />
+            <Grid item md={4} xs={12}>
+              <TotalComplaints count={DashboardData.complaints} />
             </Grid>
           </Grid>
+          <Box mt={10} xs={12}>
+            <BarChart object={DashboardData} />
+          </Box>
         </Container>
       </Box>
     </Container>
