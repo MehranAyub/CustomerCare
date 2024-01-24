@@ -11,6 +11,7 @@ import {
   Grid,
   Dialog,
   DialogContent,
+  DialogActions,
   DialogTitle,
   Button,
   CircularProgress,
@@ -39,6 +40,7 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 const menuItems = [
   "Wrong Order",
@@ -77,22 +79,22 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function CustomerComplaints() {
+function Blogs() {
   const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
 
-  const [complaintList, setComplaintList] = useState([]);
+  const [blogList, setBlogList] = useState([]);
   const [files, setFiles] = useState([]);
   const [name, setName] = useState("");
-  const [selectedComplaint, setSelectedComplaint] = useState({});
-  const [foundComplaints, setFoundComplaints] = useState();
+  const [selectedBlog, setSelectedBlog] = useState({});
+  const [foundBlogs, setFoundBlogs] = useState();
   const [openAdd, setOpenAdd] = React.useState(false);
+  const [deleteConfirm, setDeleteConfirm] = React.useState(false);
   const [openDetail, setOpenDetail] = React.useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [formData, setFormData] = useState({
-    type: "",
-    subject: "",
+    heading: "",
     description: "",
   });
 
@@ -108,21 +110,19 @@ function CustomerComplaints() {
     for (let i = 0; i < files.length; i++) {
       data.append("files", files[i]);
     }
-    data.append("type", formData.type);
-    data.append("subject", formData.subject);
+    data.append("heading", formData.heading);
     data.append("description", formData.description);
-    data.append("customerId", user.id);
     axios.defaults.headers.post["Content-Type"] = "application/json";
 
     axios
-      .post("https://localhost:7268/api/Complaint/CreateComplaint", data)
+      .post("https://localhost:7268/api/Blog/CreateBlog", data)
       .then(function (response) {
         console.log(response);
 
         if (response && response.data.status === 200) {
-          setFormData({ description: "", subject: "", type: "" });
+          setFormData({ description: "", heading: "" });
           setFiles([]);
-          handleGetComplaints();
+          handleGetBlogs();
           handleClose();
         } else if (response.data.status == 403) {
           setErrorMessage("Sorry , Found Error");
@@ -136,8 +136,25 @@ function CustomerComplaints() {
       });
   };
 
+  const DeleteBlog = () => {
+    setDeleteConfirm(false);
+    axios
+      .delete("https://localhost:7268/api/Blog/" + selectedBlog.id)
+      .then((res) => {
+        if (res.data.status === 200) {
+          console.log("success");
+          setBlogList(blogList.filter((bg) => bg.id !== selectedBlog.id));
+          setFoundBlogs(blogList.filter((bg) => bg.id !== selectedBlog.id));
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   const handleClose = () => {
     setOpenAdd(false);
+    setDeleteConfirm(false);
     setOpenDetail(false);
   };
 
@@ -145,39 +162,31 @@ function CustomerComplaints() {
     const keyword = e.target.value;
 
     if (keyword !== "") {
-      const results = complaintList.filter((comp) => {
-        return (
-          comp.type.toLowerCase().startsWith(keyword.toLowerCase()) ||
-          comp.subject.toLowerCase().startsWith(keyword.toLowerCase())
-        );
+      const results = blogList.filter((comp) => {
+        return comp.heading.toLowerCase().startsWith(keyword.toLowerCase());
       });
-      setFoundComplaints(results);
+      setFoundBlogs(results);
     } else {
-      setFoundComplaints(complaintList);
+      setFoundBlogs(blogList);
     }
 
     setName(keyword);
   };
 
   useEffect(() => {
-    if (user != null && user.role === 1) {
-      handleGetComplaints();
+    if (user != null && user.role === 0) {
+      handleGetBlogs();
     } else {
       navigate("/Login");
     }
   }, []);
 
-  const handleGetComplaints = () => {
-    console.log("userId", user.id);
-    axios.defaults.headers.post["Content-Type"] = "text/plain";
+  const handleGetBlogs = () => {
     axios
-      .post(
-        "https://localhost:7268/api/Complaint/GetComplaintsByUserId?userId=" +
-          user.id
-      )
+      .get("https://localhost:7268/api/Blog")
       .then((res) => {
-        setComplaintList(res.data.entityList);
-        setFoundComplaints(res.data.entityList);
+        setBlogList(res.data.entityList);
+        setFoundBlogs(res.data.entityList);
         console.log(res);
       })
       .catch((err) => {
@@ -194,14 +203,14 @@ function CustomerComplaints() {
           justifyContent="space-between"
           alignItems="center"
         >
-          <Typography variant="h6">Complaints</Typography>
+          <Typography variant="h6">Blogs</Typography>
           <Button
             size="medium"
             variant="contained"
             onClick={() => setOpenAdd(true)}
             startIcon={<AddIcon />}
           >
-            Report
+            Post Blog
           </Button>
         </Box>
         <CardContent>
@@ -229,84 +238,71 @@ function CustomerComplaints() {
           <TableHead>
             <TableRow>
               <StyledTableCell> S.No</StyledTableCell>
-              <StyledTableCell> Type</StyledTableCell>
-              <StyledTableCell align="left">Subject</StyledTableCell>
-              <StyledTableCell align="center">Status</StyledTableCell>
+              <StyledTableCell> Heading</StyledTableCell>
               <StyledTableCell align="center">View</StyledTableCell>
+              <StyledTableCell align="center">Action</StyledTableCell>
             </TableRow>
           </TableHead>
 
           <TableBody>
-            {foundComplaints && foundComplaints.length > 0 ? (
-              foundComplaints.map((item, index) => (
+            {foundBlogs && foundBlogs.length > 0 ? (
+              foundBlogs.map((item, index) => (
                 <StyledTableRow key={item.id}>
                   <StyledTableCell align="left">{index + 1}</StyledTableCell>
 
                   <StyledTableCell component="th" scope="row">
-                    {item.type}
+                    {item.heading}
                   </StyledTableCell>
-                  <StyledTableCell align="left">{item.subject}</StyledTableCell>
-                  <StyledTableCell align="center">
-                    {item.status === 0 ? (
-                      <Chip color="primary" label="Pending" />
-                    ) : item.status === 1 ? (
-                      <Chip color="secondary" label="In Progress" />
-                    ) : item.status === 2 ? (
-                      <Chip color="success" label="Resolved" />
-                    ) : item.status === 3 ? (
-                      <Chip color="error" label="Cancelled" />
-                    ) : (
-                      ""
-                    )}
-                  </StyledTableCell>
+
                   <StyledTableCell align="center">
                     <VisibilityIcon
                       sx={{ cursor: "pointer" }}
                       onClick={() => {
-                        setSelectedComplaint(item);
+                        setSelectedBlog(item);
                         setOpenDetail(true);
                       }}
                     />
                   </StyledTableCell>
+                  <StyledTableCell align="center">
+                    <DeleteForeverIcon
+                      sx={{ color: "red", cursor: "pointer" }}
+                      onClick={() => {
+                        setSelectedBlog(item);
+                        setDeleteConfirm(true);
+                      }}
+                    />
+                    {/* |&nbsp;
+                      <VerifiedIcon
+                        color="success"
+                        sx={{ cursor: "pointer" }}
+                        onClick={() => {
+                          Action(item.id, 1);
+                        }}
+                      /> */}
+                  </StyledTableCell>
                 </StyledTableRow>
               ))
             ) : (
-              <h5>No results found!</h5>
+              <StyledTableRow aria-colspan={4}>
+                <h6 style={{ textAlign: "center" }}>No results found!</h6>
+              </StyledTableRow>
             )}
           </TableBody>
         </Table>
       </TableContainer>
       <Dialog open={openAdd} onClose={handleClose} fullWidth>
-        <DialogTitle textAlign="center">Report a Problem</DialogTitle>
+        <DialogTitle textAlign="center">Post New Blog</DialogTitle>
         <DialogContent>
           <Box component="form" onSubmit={handleSubmit} mt={1}>
             <Grid container spacing={3} justifyContent="flex-start">
               <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel id="select">Type</InputLabel>
-                  <Select
-                    labelId="select"
-                    id="select"
-                    required
-                    value={formData.type}
-                    label="Type"
-                    name="type"
-                    onChange={handleChange}
-                  >
-                    {menuItems.map((item) => (
-                      <MenuItem value={item}>{item}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12}>
                 <TextField
-                  name="subject"
+                  name="heading"
                   fullWidth
-                  label="Subject"
+                  label="Heading"
                   size="small"
                   required
-                  value={formData.subject}
+                  value={formData.heading}
                   onChange={handleChange}
                 />
               </Grid>
@@ -428,52 +424,36 @@ function CustomerComplaints() {
       </Dialog>
 
       <Dialog open={openDetail} onClose={handleClose} fullWidth>
-        <DialogTitle textAlign="center">Complaint Detail</DialogTitle>
+        <DialogTitle textAlign="center">Blog Detail</DialogTitle>
         <DialogContent>
           <Box mt={1}>
             <Grid container spacing={3} justifyContent="flex-start">
               <Grid item xs={12}>
                 <Typography>
-                  <b>Type :</b> {selectedComplaint.type}
+                  <b>Heading</b>
                 </Typography>
               </Grid>
               <Grid item xs={12}>
-                <Typography>
-                  <b>Subject :</b> {selectedComplaint.subject}
-                </Typography>
+                <Typography>{selectedBlog.heading}</Typography>
               </Grid>
               <Grid item xs={12}>
                 <Typography>
-                  <b> Description :</b> {selectedComplaint.description}
+                  <b> Description</b>
                 </Typography>
               </Grid>
               <Grid item xs={12}>
-                <Typography>
-                  <b> Status :</b>
-                  <span style={{ marginLeft: "10px" }}>
-                    {selectedComplaint.status === 0 ? (
-                      <Chip color="primary" label="Pending" />
-                    ) : selectedComplaint.status === 1 ? (
-                      <Chip color="secondary" label="In Progress" />
-                    ) : selectedComplaint.status === 2 ? (
-                      <Chip color="success" label="Resolved" />
-                    ) : selectedComplaint.status === 3 ? (
-                      <Chip color="error" label="Cancelled" />
-                    ) : (
-                      ""
-                    )}
-                  </span>
-                  <span style={{ marginLeft: "20px", color: "red" }}>
-                    {selectedComplaint.status === 0
-                      ? "Agent Not Assigned*"
-                      : ""}{" "}
-                  </span>
-                </Typography>
+                <Typography>{selectedBlog.description}</Typography>
               </Grid>
-              <Grid item xs={12}>
-                <Typography>
-                  <b> Agent Remarks :</b> {selectedComplaint.agentRemarks}
-                </Typography>
+              <Grid item xs={12} width="100%">
+                {selectedBlog.images && selectedBlog.images.length > 0
+                  ? selectedBlog.images.map((img, index) => (
+                      <img
+                        key={index}
+                        style={{ width: "200px" }}
+                        src={"https://localhost:7268/Assets/" + img.imageData}
+                      />
+                    ))
+                  : "No Images."}
               </Grid>
             </Grid>
 
@@ -490,8 +470,34 @@ function CustomerComplaints() {
           </Box>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={deleteConfirm} onClose={handleClose} fullWidth>
+        <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
+          Confirm to Delete
+        </DialogTitle>
+        <DialogContent>Are you sure to delete this blog?</DialogContent>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
+          <Button
+            autoFocus
+            onClick={() => {
+              setDeleteConfirm(false);
+            }}
+          >
+            No
+          </Button>
+          <Button
+            onClick={() => {
+              if (selectedBlog !== "") DeleteBlog();
+            }}
+          >
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }
 
-export default CustomerComplaints;
+export default Blogs;

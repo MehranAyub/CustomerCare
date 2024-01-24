@@ -15,7 +15,9 @@ import {
   Button,
   CircularProgress,
   TextareaAutosize,
-  IconButton,
+  DialogActions,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
@@ -30,6 +32,8 @@ import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import CloseIcon from "@mui/icons-material/Close";
+import CancelIcon from "@mui/icons-material/Cancel";
+
 import {
   Box,
   Card,
@@ -82,35 +86,43 @@ function AgentComplaints() {
   const navigate = useNavigate();
 
   const [complaintList, setComplaintList] = useState([]);
-  const [files, setFiles] = useState([]);
+  const [remarks, setRemarks] = useState("");
   const [name, setName] = useState("");
   const [selectedComplaint, setSelectedComplaint] = useState({});
+  const [selectedCustomer, setSelectedCustomer] = useState({});
   const [foundComplaints, setFoundComplaints] = useState();
-  const [openAdd, setOpenAdd] = React.useState(false);
+  const [resolved, setResolved] = React.useState(false);
   const [openDetail, setOpenDetail] = React.useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [formData, setFormData] = useState({
-    type: "",
-    subject: "",
-    description: "",
-  });
+  const [deleteConfirm, setDeleteConfirm] = React.useState(false);
+  const [customersList, setCustomersList] = useState([]);
 
   const handleChange = (event) => {
-    setFormData({ ...formData, [event.target.name]: event.target.value });
+    setRemarks(event.target.value);
   };
-
-  const handleAssignAgent = (event) => {
+  const handleOpenDetail = (item) => {
+    let customerData = customersList.find((cus) => cus.id === item.customerId);
+    setSelectedCustomer(customerData);
+    setResolved(item.status === 2 ? true : false);
+    setOpenDetail(true);
+  };
+  const handleDeleteClose = () => {
+    setDeleteConfirm(false);
+  };
+  const handleUpdateRemarks = (isCancel) => {
     if (selectedComplaint !== null) {
-      const assignAgentRequest = {
+      const updateRemarks = {
         complaintId: selectedComplaint.id,
+        remarks: remarks,
+        complaintStatus: isCancel === true ? 3 : resolved ? 2 : 1,
       };
       setIsLoading(true);
       axios.defaults.headers.post["Content-Type"] = "application/json";
       axios
         .put(
-          "https://localhost:7268/api/Complaint/AssignAgent",
-          JSON.stringify(assignAgentRequest),
+          "https://localhost:7268/api/Complaint/UpdateComplaintRemarks",
+          JSON.stringify(updateRemarks),
           {
             headers: {
               "Content-Type": "application/json",
@@ -123,6 +135,7 @@ function AgentComplaints() {
           if (response && response.data.status === 200) {
             console.log("Agent Assigned Successfully");
             setOpenDetail(false);
+            setDeleteConfirm(false);
             handleGetComplaints();
           } else if (response.data.status == 403) {
             setErrorMessage("Got Error while Assigning Agent*");
@@ -138,7 +151,6 @@ function AgentComplaints() {
   };
 
   const handleClose = () => {
-    setOpenAdd(false);
     setOpenDetail(false);
   };
 
@@ -163,6 +175,7 @@ function AgentComplaints() {
   useEffect(() => {
     if (user != null && user.role === 2) {
       handleGetComplaints();
+      handleGetAllCustomers();
     } else {
       navigate("/Login");
     }
@@ -180,6 +193,22 @@ function AgentComplaints() {
         setComplaintList(res.data.entityList);
         setFoundComplaints(res.data.entityList);
         console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const handleGetAllCustomers = () => {
+    axios.defaults.headers.post["Content-Type"] = "text/plain";
+    axios
+      .get("https://localhost:7268/api/User/GetAllCustomers")
+      .then((res) => {
+        if (res.data.status === 200) {
+          console.log("Agents List", res.data.entityList);
+          setCustomersList(res.data.entityList);
+        }
+        console.log("Agents res", res);
       })
       .catch((err) => {
         console.log(err);
@@ -256,8 +285,9 @@ function AgentComplaints() {
                     <VisibilityIcon
                       sx={{ cursor: "pointer" }}
                       onClick={() => {
+                        setRemarks(item.agentRemarks);
                         setSelectedComplaint(item);
-                        setOpenDetail(true);
+                        handleOpenDetail(item);
                       }}
                     />
                   </StyledTableCell>
@@ -271,7 +301,33 @@ function AgentComplaints() {
       </TableContainer>
 
       <Dialog open={openDetail} onClose={handleClose} fullWidth>
-        <DialogTitle textAlign="center">Complaint Detail</DialogTitle>
+        <DialogTitle
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography>Complaint Detail</Typography>{" "}
+          <Button
+            id="basic-button"
+            sx={{ fontSize: "0.7125rem" }}
+            size="small"
+            variant="contained"
+            aria-haspopup="true"
+            disabled={
+              selectedComplaint.status === 2 || selectedComplaint.status === 3
+            }
+            color="error"
+            onClick={() => {
+              setDeleteConfirm(true);
+              // handleUpdateRemarks(true);
+            }}
+            endIcon={<CancelIcon fontSize="small" />}
+          >
+            Cancel
+          </Button>{" "}
+        </DialogTitle>
         <DialogContent>
           <Box mt={1}>
             <Grid container spacing={3} justifyContent="flex-start">
@@ -313,11 +369,57 @@ function AgentComplaints() {
                   </span>
                 </Typography>
               </Grid>
-
               <Grid item xs={12}>
                 <Typography>
-                  <b> Your Remarks :</b> {selectedComplaint.agentRemarks}
+                  <b>Customer Name :</b>{" "}
+                  {selectedCustomer?.firstName +
+                    " " +
+                    selectedCustomer?.lastName}
                 </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  <b>Phone :</b> {selectedCustomer?.phone}
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  <b>Address :</b> {selectedCustomer?.address}
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  disabled={selectedComplaint.status === 3}
+                  control={
+                    <Checkbox
+                      checked={resolved}
+                      onChange={(e) => {
+                        setResolved(e.target.checked);
+                      }}
+                      name={"resolved"}
+                    />
+                  }
+                  label={"Resolved "}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography>
+                  <b> Your Remarks </b>
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextareaAutosize
+                  aria-label="empty textarea"
+                  placeholder="Remarks"
+                  id={"remarks"}
+                  name={"remarks"}
+                  minRows={5}
+                  style={{ width: "100%" }}
+                  onChange={handleChange}
+                  value={remarks}
+                  disabled={selectedComplaint.status === 3}
+                />
               </Grid>
               <Grid item xs={12}>
                 <Typography>
@@ -346,7 +448,12 @@ function AgentComplaints() {
               mt={3}
             >
               <Button onClick={handleClose}>Close</Button>
-              <Button disabled={isLoading} onClick={handleAssignAgent}>
+              <Button
+                disabled={isLoading}
+                onClick={() => {
+                  handleUpdateRemarks(false);
+                }}
+              >
                 {isLoading ? (
                   <CircularProgress size="1rem"></CircularProgress>
                 ) : (
@@ -356,6 +463,38 @@ function AgentComplaints() {
             </Box>
           </Box>
         </DialogContent>
+      </Dialog>
+      <Dialog open={deleteConfirm} onClose={handleDeleteClose} fullWidth>
+        <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
+          Confirm to Cancel
+        </DialogTitle>
+        <DialogContent>
+          Are you sure to cancel this Complaint? Once its cancelled, you will
+          not able to update it.
+        </DialogContent>
+        <DialogActions
+          sx={{ display: "flex", justifyContent: "space-between" }}
+        >
+          <Button
+            autoFocus
+            onClick={() => {
+              setDeleteConfirm(false);
+            }}
+          >
+            No
+          </Button>
+          <Button
+            onClick={() => {
+              if (selectedComplaint !== null) handleUpdateRemarks(true);
+            }}
+          >
+            {isLoading ? (
+              <CircularProgress size="1rem"></CircularProgress>
+            ) : (
+              "Yes"
+            )}
+          </Button>
+        </DialogActions>
       </Dialog>
     </Container>
   );

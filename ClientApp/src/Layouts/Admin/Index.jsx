@@ -2,7 +2,6 @@ import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppBar from "@mui/material/AppBar";
-import Avatar from "@mui/material/Avatar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
@@ -10,14 +9,11 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import HP2 from "../../assets/Mehran.jpg";
 import { ListItemAvatar, Typography } from "@mui/material";
 import { AccountCircle } from "@mui/icons-material";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import LocalMallIcon from "@mui/icons-material/LocalMall";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LockIcon from "@mui/icons-material/Lock";
@@ -26,6 +22,9 @@ import { useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import React from "react";
 import IconButton from "@mui/material/IconButton";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import PersonIcon from "@mui/icons-material/Person";
 
 const drawerWidth = 240;
 const user = JSON.parse(localStorage.getItem("user"));
@@ -117,7 +116,15 @@ const Index = ({ children }) => {
           <ListItem disablePadding>
             <ListItemButton>
               <ListItemAvatar>
-                <Avatar alt={`Avatar`} src={HP2} />
+                {/* <Avatar alt={`Avatar`} src={HP2} /> */}
+
+                {user.role === 0 ? (
+                  <AdminPanelSettingsIcon fontSize="large" />
+                ) : user.role === 2 ? (
+                  <SupportAgentIcon fontSize="large" />
+                ) : (
+                  <PersonIcon fontSize="large" />
+                )}
               </ListItemAvatar>
               <ListItemText primary={user.firstName + " " + user.lastName} />
             </ListItemButton>
@@ -161,21 +168,21 @@ const Index = ({ children }) => {
               </ListItemButton>
             </ListItem>
             <ListItem className="listHover" disablePadding>
-              <ListItemButton onClick={() => goToPage("/orderList")}>
+              <ListItemButton onClick={() => goToPage("/blogs")}>
                 <ListItemIcon>
                   <DensitySmallIcon sx={{ color: "#ffff" }} />
                 </ListItemIcon>
                 <ListItemText primary="Blogs" />
               </ListItemButton>
             </ListItem>
-            <ListItem className="listHover" disablePadding>
+            {/* <ListItem className="listHover" disablePadding>
               <ListItemButton>
                 <ListItemIcon>
                   <AccountBoxIcon sx={{ color: "#ffff" }} />
                 </ListItemIcon>
                 <ListItemText primary="Account" />
               </ListItemButton>
-            </ListItem>
+            </ListItem> */}
 
             <ListItem className="listHover" disablePadding>
               <ListItemButton onClick={() => Logout("/login")}>
@@ -196,14 +203,14 @@ const Index = ({ children }) => {
                 <ListItemText primary="My Complaints" />
               </ListItemButton>
             </ListItem>
-            <ListItem className="listHover" disablePadding>
+            {/* <ListItem className="listHover" disablePadding>
               <ListItemButton>
                 <ListItemIcon>
                   <AccountBoxIcon sx={{ color: "#ffff" }} />
                 </ListItemIcon>
                 <ListItemText primary="Account" />
               </ListItemButton>
-            </ListItem>
+            </ListItem> */}
 
             <ListItem className="listHover" disablePadding>
               <ListItemButton onClick={() => Logout("/login")}>
@@ -224,14 +231,14 @@ const Index = ({ children }) => {
                 <ListItemText primary="Complaints" />
               </ListItemButton>
             </ListItem>
-            <ListItem className="listHover" disablePadding>
+            {/* <ListItem className="listHover" disablePadding>
               <ListItemButton>
                 <ListItemIcon>
                   <AccountBoxIcon sx={{ color: "#ffff" }} />
                 </ListItemIcon>
                 <ListItemText primary="Account" />
               </ListItemButton>
-            </ListItem>
+            </ListItem> */}
 
             <ListItem className="listHover" disablePadding>
               <ListItemButton onClick={() => Logout("/login")}>

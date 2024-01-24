@@ -208,6 +208,43 @@ namespace TheCustomerCareWebApi.Controllers
             }
         }
 
+        [HttpPut("UpdateComplaintRemarks")]
+        public async Task<PayloadCustom<string>> UpdateComplaintRemarks([FromBody] AgentRemarksRequest request)
+        {
+            try
+            {
+                var complaint = _context.Complaints.Where(n => n.Id == request.ComplaintId).FirstOrDefault();
+                if (complaint != null)
+                {
+                    complaint.AgentRemarks = request.Remarks;
+                    complaint.Status = request.ComplaintStatus;
+                    _context.Update(complaint);
+                    var data = await _context.SaveChangesAsync();
+                    if (data > 0)
+                    {
+                        return new PayloadCustom<string>()
+                        {
+                            Message = "Remarks Updated",
+                            Status = (int)HttpStatusCode.OK,
+                        };
+                    }
+                }
+
+                return new PayloadCustom<string>()
+                {
+                    Message = "Error while adding remarks",
+                    Status = (int)HttpStatusCode.NotFound,
+                };
+            }
+            catch (Exception ex)
+            {
+                return new PayloadCustom<string>()
+                {
+                    Message = ex.Message,
+                    Status = (int)HttpStatusCode.InternalServerError,
+                };
+            }
+        }
 
 
     }

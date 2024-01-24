@@ -37,8 +37,10 @@ export default function Login() {
           localStorage.setItem("user", JSON.stringify(response.data.entity));
           if (response.data.entity.role === 0) {
             window.location.href = "/dashboard";
+          } else if (response.data.entity.role === 1) {
+            window.location.href = "/CustomerComplaints";
           } else {
-            window.location.href = "/products";
+            window.location.href = "/AgentComplaints";
           }
         } else {
           setShowErrorMessage("Username or Password is incorrect");

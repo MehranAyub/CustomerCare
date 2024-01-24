@@ -337,6 +337,10 @@ function AdminComplaints() {
                   label="Agent"
                   name="agent"
                   size="small"
+                  disabled={
+                    selectedComplaint.status === 2 ||
+                    selectedComplaint.status === 3
+                  }
                   value={selectedAgent}
                   fullWidth
                   onChange={handleChange}
@@ -382,7 +386,14 @@ function AdminComplaints() {
               mt={3}
             >
               <Button onClick={handleClose}>Close</Button>
-              <Button disabled={isLoading} onClick={handleAssignAgent}>
+              <Button
+                disabled={
+                  selectedComplaint.status === 2 ||
+                  selectedComplaint.status === 3 ||
+                  isLoading
+                }
+                onClick={handleAssignAgent}
+              >
                 {isLoading ? (
                   <CircularProgress size="1rem"></CircularProgress>
                 ) : (

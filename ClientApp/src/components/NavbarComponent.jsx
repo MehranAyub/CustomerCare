@@ -16,6 +16,9 @@ function NavbarComponent() {
       <Container fluid>
         <Navbar.Brand>DocBlock</Navbar.Brand>
         <ButtonGroup className="me-2">
+          <Button variant="outline-success" onClick={() => navToPage("/home")}>
+            Home
+          </Button>{" "}
           <Button variant="outline-success" onClick={() => navToPage("/login")}>
             Login
           </Button>{" "}
